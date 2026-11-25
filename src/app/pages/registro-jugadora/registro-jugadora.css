@@ -1,0 +1,201 @@
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #0D0D0D;
+  color: #FFFFFF;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  position: relative;
+}
+
+.top-left-logo {
+  position: fixed;
+  top: 1.5rem;
+  left: 2rem;
+  z-index: 100;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.top-left-logo:hover {
+  transform: scale(1.05);
+}
+
+.top-left-logo img {
+  height: 75px;
+  width: auto;
+  display: block;
+}
+
+.register-container {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.register-card {
+  background-color: #161616;
+  border: 1px solid #262626;
+  border-radius: 20px;
+  padding: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.role-badge {
+  display: inline-block;
+  background-color: #F472B6;
+  color: #0D0D0D;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  margin-bottom: 0.75rem;
+}
+
+.register-card h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin: 0 0 0.3rem 0;
+  text-align: center;
+}
+
+.subtitle {
+  color: #A3A3A3;
+  font-size: 0.9rem;
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+}
+
+.input-row {
+  display: flex;
+  gap: 0.85rem;
+}
+
+.input-row .input-group {
+  flex: 1;
+}
+
+.input-row .number-group {
+  flex: 0.45;
+}
+
+.input-group {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #D4D4D4;
+  margin-bottom: 0.35rem;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 0.8rem 0.95rem;
+  background-color: #1F1F1F;
+  border: 1px solid #333333;
+  border-radius: 10px;
+  color: #FFFFFF;
+  font-size: 0.92rem;
+  outline: none;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  border-color: #FFFFFF;
+}
+
+/* Ajusta el ícono del calendario al modo oscuro */
+input[type="date"] {
+  color-scheme: dark;
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 2.75rem;
+}
+
+.toggle-pass {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #A3A3A3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.toggle-pass:hover {
+  color: #FFFFFF;
+}
+
+.cta-button {
+  width: 100%;
+  padding: 0.9rem;
+  margin-top: 0.5rem;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #FF5722, #FFD600, #00E676, #00B0FF, #D916E2);
+  color: #0D0D0D;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.login-link-text {
+  margin: 1.5rem 0 0 0;
+  font-size: 0.85rem;
+  color: #A3A3A3;
+  text-align: center;
+}
+
+.login-link-text a {
+  color: #FFFFFF;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+@media (max-width: 575.98px) {
+  :host {
+    flex-direction: column;
+    padding-top: 1.5rem;
+  }
+
+  .top-left-logo {
+    position: static;
+    margin-bottom: 1rem;
+  }
+
+  .top-left-logo img {
+    height: 65px;
+  }
+
+  .input-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .register-card {
+    padding: 1.5rem 1.25rem;
+  }
+}

@@ -1,0 +1,210 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #0D0D0D;
+  color: #FFFFFF;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+/* Barra superior fija estilo FotMob */
+.fotmob-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background-color: #161616;
+  border-bottom: 1px solid #262626;
+  padding: 0 1.5rem;
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: #FFFFFF;
+}
+
+.brand-logo img {
+  height: 44px;
+  width: auto;
+}
+
+.brand-name {
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: 0.5px;
+}
+
+/* Buscador estilo FotMob */
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #222222;
+  border: 1px solid #333333;
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  color: #A3A3A3;
+  width: 260px;
+}
+
+.search-box input {
+  background: transparent;
+  border: none;
+  color: #FFFFFF;
+  font-size: 0.85rem;
+  outline: none;
+  width: 100%;
+  font-family: inherit;
+}
+
+/* Enlaces centrales con indicador inferior activo */
+.nav-links {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: 0.5rem;
+}
+
+.nav-item {
+  height: 100%;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #A3A3A3;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0 0.9rem;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  font-family: inherit;
+}
+
+.nav-item:hover {
+  color: #FFFFFF;
+}
+
+.nav-item.active {
+  color: #FFFFFF;
+  border-bottom-color: #00E676;
+}
+
+/* Derecha: Perfil y Salir */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.role-pill {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  color: #0D0D0D;
+}
+
+.role-pill.admin { background-color: #38BDF8; }
+.role-pill.equipo { background-color: #FACC15; }
+.role-pill.jugadora { background-color: #F472B6; }
+
+.user-name {
+  font-size: 0.85rem;
+  color: #D4D4D4;
+  max-width: 130px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logout-btn {
+  background-color: #222222;
+  border: 1px solid #333333;
+  color: #D4D4D4;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.logout-btn:hover {
+  background-color: #3F1515;
+  border-color: #DC2626;
+  color: #FCA5A5;
+}
+
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: #FFFFFF;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+/* Responsivo */
+@media (max-width: 900px) {
+  .search-box, .user-name {
+    display: none;
+  }
+
+  .mobile-menu-btn {
+    display: block;
+  }
+
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 68px;
+    left: 0;
+    right: 0;
+    height: auto;
+    flex-direction: column;
+    background-color: #161616;
+    border-bottom: 1px solid #262626;
+    padding: 0.5rem 0;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-item {
+    width: 100%;
+    padding: 0.85rem 1.5rem;
+    text-align: left;
+    border-bottom: none;
+    border-left: 3px solid transparent;
+  }
+
+  .nav-item.active {
+    border-left-color: #00E676;
+    background-color: #1F1F1F;
+  }
+}
