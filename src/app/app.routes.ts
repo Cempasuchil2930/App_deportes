@@ -52,16 +52,26 @@ export const routes: Routes = [
       ),
   },
 
-  // 4. Rutas públicas que conectará Dev 1 (Equipos -> Jugadoras y Torneo)
-  { path: 'torneo', component: Home },
-  { path: 'equipos', component: Home },
-  { path: 'jugadora/:id', component: Home },
-
+  // 4. Módulo de Competición (Dev 1: Torneo, Equipos y Perfil de Jugadora)
+  {
+    path: 'torneo',
+    loadComponent: () =>
+      import('./features/competition/tournament-page/tournament-page').then(
+        (m) => m.TournamentPageComponent,
+      ),
+  },
   {
     path: 'equipos',
     loadComponent: () =>
       import('./features/competition/teams-page/teams-page').then(
         (m) => m.TeamsPageComponent,
+      ),
+  },
+  {
+    path: 'jugadora/:id',
+    loadComponent: () =>
+      import('./features/competition/player-profile-page/player-profile-page').then(
+        (m) => m.PlayerProfilePageComponent,
       ),
   },
 
