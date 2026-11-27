@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { Home } from './pages/home/home';
+import { roleGuard } from './core/guards/role-guard';
 
 export const routes: Routes = [
   // 1. Flujos de Acceso y Registro (Sin Sidebar ni Topbar - Dev 2)
@@ -40,6 +41,8 @@ export const routes: Routes = [
   { path: 'home', component: Home },
   {
     path: 'entrenamientos',
+    canActivate: [roleGuard],
+    data: { roles: ['PLAYER', 'CAPTAIN', 'ADMIN'] },
     loadComponent: () =>
       import('./pages/entrenamientos/entrenamientos').then((m) => m.Entrenamientos),
   },
@@ -47,6 +50,7 @@ export const routes: Routes = [
   // 3. Panel de Administración y Cédula Arbitral (Dev 2)
   {
     path: 'admin',
+    canActivate: [roleGuard],
     data: { roles: ['ADMIN'] },
     loadComponent: () =>
       import('./features/auth-admin/admin-panel-page/admin-panel-page').then(
@@ -54,21 +58,10 @@ export const routes: Routes = [
       ),
   },
 
-  // 4. Rutas temporales mientras Dev 1 sube sus páginas
-{
-    path: 'torneo',
-    loadComponent: () =>
-      import('./features/competition/tournament-page/tournament-page').then(
-        (m) => m.TournamentPageComponent,
-      ),
-  },
-  {
-    path: 'jugadora/:id',
-    loadComponent: () =>
-      import('./features/competition/player-profile-page/player-profile-page').then(
-        (m) => m.PlayerProfilePageComponent,
-      ),
-  },
+  // 4. Rutas públicas que conectará Dev 1 (Equipos -> Jugadoras y Torneo)
+  { path: 'torneo', component: Home },
+  { path: 'equipos', component: Home },
+  { path: 'jugadora/:id', component: Home },
 
   // Comodín siempre al final
   { path: '**', redirectTo: 'home' },

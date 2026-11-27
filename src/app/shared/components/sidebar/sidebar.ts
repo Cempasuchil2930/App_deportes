@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
+import { Component, Input, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService, UserRole } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-sidebar',
@@ -55,29 +56,31 @@ import { Router, RouterModule } from '@angular/router';
           </button>
         </div>
 
-        <!-- Selector de Rol Simulado -->
+        <!-- Tarjeta informativa de Sesión Activa -->
         @if (!collapsed()) {
-          <div class="mt-5">
-            <label
-              class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5"
-            >
-              Rol Simulado
-            </label>
-            <select
-              [value]="currentRole"
-              (change)="onSelectRole($event)"
-              class="w-full rounded-xl border border-slate-200 dark:border-[#232730] bg-slate-50 dark:bg-[#0B0D10] text-slate-900 dark:text-white px-3 py-2 text-xs font-semibold focus:outline-none focus:border-purple-500"
-            >
-              <option value="PUBLIC">Público / Visitante</option>
-              <option value="PLAYER">Jugadora Registrada</option>
-              <option value="CAPTAIN">Capitana de Equipo</option>
-              <option value="ADMIN">Admin General (Nayeli)</option>
-            </select>
+          <div
+            class="mt-5 p-3 rounded-xl border border-slate-200/80 dark:border-[#232730] bg-slate-50/80 dark:bg-[#0B0D10]"
+          >
+            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              Sesión Actual
+            </p>
+            <div class="mt-1 flex items-center justify-between gap-2">
+              <span class="text-xs font-bold text-slate-900 dark:text-white truncate">
+                {{ roleInfo().label }}
+              </span>
+              <span
+                [class]="roleInfo().badgeClass"
+                class="px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0"
+              >
+                {{ roleInfo().tag }}
+              </span>
+            </div>
           </div>
         }
 
-        <!-- Navegación Principal con Iconos Vectoriales SVG -->
+        <!-- Navegación filtrada por Rol -->
         <nav class="mt-6 space-y-1">
+          <!-- 1. Inicio (Todos) -->
           <a
             routerLink="/home"
             routerLinkActive="bg-slate-100 dark:bg-[#1F242D] text-slate-900 dark:text-white font-semibold"
@@ -101,6 +104,7 @@ import { Router, RouterModule } from '@angular/router';
             }
           </a>
 
+          <!-- 2. Torneo y Tablas (Todos) -->
           <a
             routerLink="/torneo"
             routerLinkActive="bg-slate-100 dark:bg-[#1F242D] text-slate-900 dark:text-white font-semibold"
@@ -124,8 +128,9 @@ import { Router, RouterModule } from '@angular/router';
             }
           </a>
 
+          <!-- 3. Equipos -> Jugadoras (Todos, módulo Dev 1) -->
           <a
-            routerLink="/jugadora/1"
+            routerLink="/equipos"
             routerLinkActive="bg-slate-100 dark:bg-[#1F242D] text-slate-900 dark:text-white font-semibold"
             class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-[#1B1F27] hover:text-slate-900 dark:hover:text-white transition"
           >
@@ -139,55 +144,65 @@ import { Router, RouterModule } from '@angular/router';
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
             @if (!collapsed()) {
-              <span class="truncate">Perfil Jugadora</span>
+              <span class="truncate">Equipos</span>
             }
           </a>
 
-          <a
-            routerLink="/entrenamientos"
-            routerLinkActive="bg-slate-100 dark:bg-[#1F242D] text-slate-900 dark:text-white font-semibold"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-[#1B1F27] hover:text-slate-900 dark:hover:text-white transition"
-          >
-            <svg
-              class="w-4 h-4 shrink-0"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              viewBox="0 0 24 24"
+          <!-- 4. Entrenamientos (Solo Jugadoras y Admin; oculto a Invitado) -->
+          @if (currentRole !== 'PUBLIC') {
+            <a
+              routerLink="/entrenamientos"
+              routerLinkActive="bg-slate-100 dark:bg-[#1F242D] text-slate-900 dark:text-white font-semibold"
+              class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-[#1B1F27] hover:text-slate-900 dark:hover:text-white transition"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            @if (!collapsed()) {
-              <span class="truncate">Entrenamientos</span>
-            }
-          </a>
+              <svg
+                class="w-4 h-4 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+              @if (!collapsed()) {
+                <span class="truncate">Entrenamientos</span>
+              }
+            </a>
+          }
 
-          <a
-            routerLink="/admin"
-            routerLinkActive="bg-slate-100 dark:bg-[#1F242D] text-slate-900 dark:text-white font-semibold"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-[#1B1F27] hover:text-slate-900 dark:hover:text-white transition"
-          >
-            <svg
-              class="w-4 h-4 shrink-0"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              viewBox="0 0 24 24"
+          <!-- 5. Panel Admin & Cédula (Exclusivo Admin) -->
+          @if (currentRole === 'ADMIN') {
+            <a
+              routerLink="/admin"
+              routerLinkActive="bg-slate-100 dark:bg-[#1F242D] text-slate-900 dark:text-white font-semibold"
+              class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-[#1B1F27] hover:text-slate-900 dark:hover:text-white transition"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-              />
-            </svg>
-            @if (!collapsed()) {
-              <span class="truncate">Panel Admin & Cédula</span>
-            }
-          </a>
+              <svg
+                class="w-4 h-4 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
+              @if (!collapsed()) {
+                <span class="truncate">Panel Admin & Cédula</span>
+              }
+            </a>
+          }
         </nav>
       </div>
 
@@ -283,17 +298,38 @@ import { Router, RouterModule } from '@angular/router';
 })
 export class SidebarComponent {
   private router = inject(Router);
+  private authService = inject(AuthService);
 
-  @Input() currentRole = 'PUBLIC';
-  @Output() roleChange = new EventEmitter<string>();
+  @Input() currentRole: UserRole = 'PUBLIC';
 
   collapsed = signal(false);
   isDark = signal(document.documentElement.classList.contains('dark'));
 
-  onSelectRole(event: Event) {
-    const value = (event.target as HTMLSelectElement).value;
-    this.roleChange.emit(value);
-  }
+  roleInfo = computed(() => {
+    const map: Record<UserRole, { label: string; tag: string; badgeClass: string }> = {
+      PUBLIC: {
+        label: 'Visitante Invitada',
+        tag: 'Invitada',
+        badgeClass: 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+      },
+      PLAYER: {
+        label: 'Jugadora Oficial',
+        tag: 'Jugadora',
+        badgeClass: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300',
+      },
+      CAPTAIN: {
+        label: 'Jugadora Oficial',
+        tag: 'Jugadora',
+        badgeClass: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300',
+      },
+      ADMIN: {
+        label: 'Administración',
+        tag: 'Admin',
+        badgeClass: 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300',
+      },
+    };
+    return map[this.currentRole] ?? map.PUBLIC;
+  });
 
   toggleTheme() {
     const html = document.documentElement;
@@ -302,8 +338,7 @@ export class SidebarComponent {
   }
 
   cerrarSesion() {
-    localStorage.removeItem('sesionActiva');
-    this.roleChange.emit('PUBLIC');
+    this.authService.cerrarSesion();
     this.router.navigate(['/login']);
   }
 }
