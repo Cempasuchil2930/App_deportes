@@ -13,7 +13,7 @@ export const roleGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  return router.createUrlTree(['/auth'], {
+  return router.createUrlTree(['/login'], {
     queryParams: { returnUrl: state.url, reason: 'unauthorized' }
   });
 };
