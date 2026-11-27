@@ -55,8 +55,20 @@ export const routes: Routes = [
   },
 
   // 4. Rutas temporales mientras Dev 1 sube sus páginas
-  { path: 'torneo', component: Home },
-  { path: 'jugadora/:id', component: Home },
+{
+    path: 'torneo',
+    loadComponent: () =>
+      import('./features/competition/tournament-page/tournament-page').then(
+        (m) => m.TournamentPageComponent,
+      ),
+  },
+  {
+    path: 'jugadora/:id',
+    loadComponent: () =>
+      import('./features/competition/player-profile-page/player-profile-page').then(
+        (m) => m.PlayerProfilePageComponent,
+      ),
+  },
 
   // Comodín siempre al final
   { path: '**', redirectTo: 'home' },
