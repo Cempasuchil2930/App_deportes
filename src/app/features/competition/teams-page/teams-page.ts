@@ -55,7 +55,7 @@ import { LigaDataService } from '../../../shared/services/liga-data';
         </div>
       </div>
 
-      <!-- 2. CABECERA DEL EQUIPO SELECCIONADO (SIN BOTÓN SEGUIR Y SIN FILTROS) -->
+      <!-- 2. CABECERA DEL EQUIPO SELECCIONADO -->
       <div
         class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] overflow-hidden shadow-xs"
       >
@@ -106,7 +106,7 @@ import { LigaDataService } from '../../../shared/services/liga-data';
         </div>
       </div>
 
-      <!-- 3. BLOQUE PRINCIPAL DE INFORMACIÓN DEL EQUIPO (TODO VISIBLE) -->
+      <!-- 3. BLOQUE PRINCIPAL DE INFORMACIÓN DEL EQUIPO -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         <!-- COLUMNA IZQUIERDA (7 cols): Partido Siguiente + Últimos Partidos -->
         <div class="lg:col-span-7 space-y-5">
@@ -370,51 +370,55 @@ import { LigaDataService } from '../../../shared/services/liga-data';
         </div>
       </div>
 
-      <!-- 4. EQUIPO (PLANTILLA COMPLETA POR POSICIÓN EN CANCHA) -->
+      <!-- 4. EQUIPO (PLANTILLA COMPLETA UNIFICADA CON POSICIÓN POR ESCRITO) -->
       <div
-        class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs space-y-5"
+        class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs space-y-4"
       >
         <div class="flex items-center justify-between">
           <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">
-            Equipo ({{ rosterActivo().length }} Integrantes)
+            Equipo ({{ rosterOrdenado().length }} Integrantes)
           </h2>
           <span class="text-[11px] text-slate-400">
             Selecciona una jugadora para ver su ficha
           </span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          @for (grupo of plantillaPorPosicion(); track grupo.titulo) {
-            <div class="space-y-2.5">
-              <div class="flex items-center gap-2">
-                <span [class]="grupo.dotColor" class="w-2 h-2 rounded-full"></span>
-                <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  {{ grupo.titulo }} ({{ grupo.jugadoras.length }})
-                </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+          @for (j of rosterOrdenado(); track j.playerId) {
+            <button
+              type="button"
+              (click)="irAPerfilJugadora(j.playerId)"
+              class="card-hover-prism px-4 py-3 rounded-xl bg-slate-50/90 dark:bg-[#1A1E26] border border-slate-200/80 dark:border-[#262B37] flex items-center justify-between gap-3 text-left group cursor-pointer"
+            >
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span
+                  class="text-xs font-extrabold text-purple-600 dark:text-purple-400 shrink-0"
+                >
+                  #{{ j.dorsal }}
+                </span>
+                <span class="text-slate-300 dark:text-slate-600 shrink-0">•</span>
+                <span
+                  class="text-xs font-bold text-slate-800 dark:text-slate-100 group-hover:text-purple-600 dark:group-hover:text-purple-400 truncate"
+                >
+                  {{ j.nick }}
+                </span>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                @for (j of grupo.jugadoras; track j.playerId) {
-                  <button
-                    type="button"
-                    (click)="irAPerfilJugadora(j.playerId)"
-                    class="card-hover-prism px-3.5 py-2.5 rounded-xl bg-slate-50/90 dark:bg-[#1A1E26] border border-slate-200/80 dark:border-[#262B37] flex items-center gap-2.5 text-left group cursor-pointer"
-                  >
-                    <span
-                      class="text-xs font-extrabold text-purple-600 dark:text-purple-400 shrink-0"
-                    >
-                      #{{ j.dorsal }}
-                    </span>
-                    <span class="text-slate-300 dark:text-slate-600">•</span>
-                    <span
-                      class="text-xs font-bold text-slate-800 dark:text-slate-100 group-hover:text-purple-600 dark:group-hover:text-purple-400 truncate"
-                    >
-                      {{ j.nick }}
-                    </span>
-                  </button>
-                }
-              </div>
-            </div>
+              <span
+                class="text-[11px] font-semibold shrink-0"
+                [class]="
+                  j.position === 'Portera'
+                    ? 'text-blue-600 dark:text-blue-400'
+                    : j.position === 'Delantera'
+                      ? 'text-rose-500'
+                      : j.position === 'Media'
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-purple-600 dark:text-purple-400'
+                "
+              >
+                {{ j.position }}
+              </span>
+            </button>
           }
         </div>
       </div>
@@ -439,6 +443,10 @@ export class TeamsPageComponent {
     () => this.ligaData.rostersPorEquipo[this.selectedTeamId()] ?? [],
   );
 
+  readonly rosterOrdenado = computed(() =>
+    [...this.rosterActivo()].sort((a, b) => a.dorsal - b.dorsal),
+  );
+
   readonly miniTablaContexto = computed(() => {
     const ordenada = this.ligaData.tablaOrdenada();
     const idx = ordenada.findIndex((t) => t.id === this.selectedTeamId());
@@ -447,32 +455,6 @@ export class TeamsPageComponent {
       pos: start + i + 1,
       team,
     }));
-  });
-
-  readonly plantillaPorPosicion = computed(() => {
-    const lista = this.rosterActivo();
-    return [
-      {
-        titulo: 'Porteras',
-        dotColor: 'bg-blue-500',
-        jugadoras: lista.filter((j) => j.position === 'Portera'),
-      },
-      {
-        titulo: 'Defensas',
-        dotColor: 'bg-purple-500',
-        jugadoras: lista.filter((j) => j.position === 'Defensa'),
-      },
-      {
-        titulo: 'Medias',
-        dotColor: 'bg-emerald-500',
-        jugadoras: lista.filter((j) => j.position === 'Media'),
-      },
-      {
-        titulo: 'Delanteras',
-        dotColor: 'bg-rose-500',
-        jugadoras: lista.filter((j) => j.position === 'Delantera'),
-      },
-    ];
   });
 
   obtenerPosicion(teamId: number): number {
