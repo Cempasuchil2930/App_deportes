@@ -1,18 +1,16 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-
-interface MvpPlayer {
-  id: number;
-  badge: string;
-  badgeColor: string;
-  initials: string;
-  name: string;
-  team: string;
-  position: 'Delantera' | 'Media' | 'Defensa' | 'Portera';
-  pronouns: string;
-  dorsal: number;
-  statsLine: string;
+import { LigaDataService } from '../../shared/services/liga-data';
+export interface ReelItem {
+  id: string;
+  round: string;
+  title: string;
+  match: string;
+  duration: string;
+  protagonist: string;
+  description: string;
+  accentGradient: string;
 }
 
 @Component({
@@ -23,80 +21,51 @@ interface MvpPlayer {
   styleUrl: './home.css',
 })
 export class Home {
+  private ligaData = inject(LigaDataService);
+
   positions = ['Todas', 'Delantera', 'Media', 'Defensa', 'Portera'];
   selectedPos = signal('Todas');
-
-  players: MvpPlayer[] = [
-    {
-      id: 20,
-      badge: 'Jugadora de la Jornada',
-      badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
-      initials: 'VA',
-      name: 'Valeria "Val" Ríos',
-      team: 'Queer Goals',
-      position: 'Media',
-      pronouns: 'Ella / She',
-      dorsal: 20,
-      statsLine: "8 PJ • 310' • 9 Goles • 6 Asist",
-    },
-    {
-      id: 9,
-      badge: 'Goleadora',
-      badgeColor: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300',
-      initials: 'CA',
-      name: 'Camila "Cami" Mendoza',
-      team: 'Valquirias',
-      position: 'Delantera',
-      pronouns: 'Elle / They',
-      dorsal: 9,
-      statsLine: "8 PJ • 320' • 12 Goles • 2 Asist",
-    },
-    {
-      id: 1,
-      badge: 'Mejor Portera',
-      badgeColor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-      initials: 'SO',
-      name: 'Sofía "Sofi" Navarro',
-      team: 'F.C. Lionesses',
-      position: 'Portera',
-      pronouns: 'Ella / She',
-      dorsal: 1,
-      statsLine: "8 PJ • 320' • 36 Atajadas",
-    },
-    {
-      id: 7,
-      badge: 'Muro Defensivo',
-      badgeColor: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
-      initials: 'RA',
-      name: 'Alex "Rayo" Torres',
-      team: 'Atlético Diversa',
-      position: 'Defensa',
-      pronouns: 'Elle / They',
-      dorsal: 7,
-      statsLine: "8 PJ • 295' • 3 Goles • 4 Asist",
-    },
-  ];
+  selectedReel = signal<ReelItem | null>(null);
 
   filteredPlayers = computed(() => {
     const pos = this.selectedPos();
-    return pos === 'Todas' ? this.players : this.players.filter((p) => p.position === pos);
+    const list = this.ligaData.jugadorasMvp();
+    return pos === 'Todas' ? list : list.filter((p) => p.position === pos);
   });
 
-  upcomingMatches = [
-    { round: 'Jornada 09', time: 'Dom 09:00 • Cancha 1', home: 'Queer Goals', away: 'Valquirias' },
+  upcomingMatches = this.ligaData.proximosPartidos;
+  topTeams = this.ligaData.top5Equipos;
+
+  reels: ReelItem[] = [
     {
-      round: 'Jornada 09',
-      time: 'Dom 09:50 • Cancha 1',
-      home: 'F.C. Lionesses',
-      away: 'Lobas México',
+      id: 'reel-penales-j08',
+      round: 'Jornada 08',
+      title: 'Penales Cardíacos J08',
+      match: 'Valquirias (4) 2 - 2 (3) F.C. Lionesses',
+      duration: '0:42',
+      protagonist: 'Camila "Cami" Mendoza • #9',
+      description:
+        'Tras empatar 2-2 en los 40 minutos reglamentarios, la serie se definió desde los once pasos con cobro cruzado al ángulo para darle los 3 puntos a Valquirias.',
+      accentGradient: 'from-rose-600 via-purple-600 to-indigo-700',
+    },
+    {
+      id: 'reel-atajada-sofi',
+      round: 'Jornada 08',
+      title: 'Vuelo de Sofi Navarro',
+      match: 'F.C. Lionesses vs Lobas México',
+      duration: '0:28',
+      protagonist: 'Sofía "Sofi" Navarro • #1',
+      description:
+        'Doble reacción al minuto 37: desvió un disparo a quemarropa y alcanzó a manotear el contrarremate sobre la línea para mantener su portería invicta.',
+      accentGradient: 'from-blue-600 via-cyan-600 to-emerald-600',
     },
   ];
 
-  topTeams = [
-    { abbr: 'QG', name: 'Queer Goals', record: '7G-1P', pts: 21, color: 'bg-purple-600' },
-    { abbr: 'VLQ', name: 'Valquirias', record: '6G-2P', pts: 18, color: 'bg-rose-600' },
-    { abbr: 'LIO', name: 'F.C. Lionesses', record: '6G-2P', pts: 18, color: 'bg-blue-600' },
-    { abbr: 'GV', name: 'Good Vibes', record: '5G-3P', pts: 15, color: 'bg-emerald-600' },
-    { abbr: 'LOB', name: 'Lobas México', record: '5G-3P', pts: 15, color: 'bg-amber-600' },
-  ];
+  openReel(reel: ReelItem) {
+    this.selectedReel.set(reel);
+  }
+
+  closeReel() {
+    this.selectedReel.set(null);
+  }
 }
