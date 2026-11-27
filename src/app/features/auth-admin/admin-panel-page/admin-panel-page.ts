@@ -1,996 +1,363 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { AuthService } from '../../../core/services/auth';
+import { FormsModule } from '@angular/forms';
 
-type AdminTab = 'CEDULA' | 'JUGADORAS' | 'ENTRENAMIENTOS';
+type AdminTab = 'PANEL' | 'CEDULA';
 
-export interface PendingRegistration {
+interface TeamRequestItem {
   id: string;
-  registrationType: 'CAPTAIN' | 'PLAYER';
-  teamName?: string;
-  fullName: string;
-  shirtName: string;
+  teamName: string;
+  teamCode: string;
+  jerseyColor: string;
+  captainName: string;
+  email: string;
+  status: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO';
+}
+
+interface PlayerEventRow {
   dorsal: number;
-  position: string;
-  pronouns: string;
-  photoAuthorized: boolean;
-  status: 'PENDING' | 'ACTIVE' | 'REJECTED';
-  confidential: {
-    phone: string;
-    zone: string;
-    emergencyContact: string;
-    medicalConditions: string;
-  };
-  drawerOpen: boolean;
-}
-
-export interface ActivePlayerRoster {
-  id: string;
-  shirtName: string;
-  team: string;
-  position: string;
-  dorsal: number;
-  goals: number;
-  assists: number;
-  saves: number;
-  minutesPlayed: number;
-}
-
-export interface TrainingSession {
-  id: string;
-  title: string;
-  category: 'Clínica Técnica' | 'Entrenamiento Abierto' | 'Porteras';
-  date: string;
-  time: string;
-  location: string;
-  spotsAvailable: number;
-  active: boolean;
-}
-
-export interface TeamStanding {
   name: string;
-  pj: number;
-  pg: number;
-  pp: number;
-  gf: number;
-  gc: number;
-  pts: number;
+  goals: number;
+  yellowCards: number;
+  redCards: number;
 }
 
 @Component({
   selector: 'app-admin-panel-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule],
   template: `
-    <div class="min-h-screen bg-[#FAF9F7] dark:bg-[#0B0D10] text-[#111111] dark:text-slate-100 p-4 sm:p-6 space-y-5">
-      
-      <!-- Banner Superior con Línea Cromática 2px y Botón Cerrar Sesión -->
-      <div class="rounded-2xl bg-white dark:bg-[#14171C] border border-[#ECEAE6] dark:border-[#232730] shadow-xs overflow-hidden">
-        <div class="h-[2px] w-full bg-gradient-to-r from-[#F43F5E] via-[#EAB308] via-[#10B981] via-[#3B82F6] to-[#8B5CF6]"></div>
-        <div class="px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-[#F43F5E]"></span>
-              <h1 class="text-lg font-extrabold tracking-tight text-[#111111] dark:text-white">
-                Panel Administrativo & Cédula Arbitral
-              </h1>
-            </div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Cédula dominical de 40 min, gestión de jugadoras/dorsales y control de entrenamientos
-            </p>
-          </div>
+    <!-- Exterior transparente sobre el degradado de la pantalla -->
+    <div class="min-h-screen bg-transparent text-[#111111] dark:text-slate-100 p-4 sm:p-8 transition-colors duration-300">
+      <div class="max-w-[1140px] mx-auto space-y-6">
 
-          <div class="flex items-center gap-2.5">
-            <span class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#FFF1F2] dark:bg-rose-950/60 text-[#F43F5E] border border-[#FECDD3] dark:border-rose-800/70">
-              Sesión: Admin Nayeli
-            </span>
+        <!-- Título principal y selector de vista -->
+        <div class="flex flex-wrap items-center justify-between gap-4 px-1">
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#111111] dark:text-white">
+            {{ activeTab() === 'PANEL' ? 'Panel Administrativo' : 'Cédula Arbitral' }}
+          </h1>
+
+          <div class="flex flex-wrap items-center gap-2.5">
             <button
               type="button"
-              (click)="logout()"
-              class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#111111] dark:bg-white text-white dark:text-[#111111] hover:bg-[#F43F5E] hover:text-white dark:hover:bg-[#F43F5E] dark:hover:text-white transition-all cursor-pointer">
-              Cerrar Sesión
+              (click)="activeTab.set('PANEL')"
+              [ngClass]="activeTab() === 'PANEL'
+                ? 'bg-[#FCE7EB] text-[#8E3545] border-[#C57B87]/70'
+                : 'bg-white dark:bg-[#14171C] text-slate-700 dark:text-slate-300 border-slate-200/90 dark:border-[#232730] hover:bg-slate-50'"
+              class="px-5 py-2.5 rounded-full text-xs font-bold border transition-colors cursor-pointer">
+              Panel Administrativo
+            </button>
+
+            <button
+              type="button"
+              (click)="activeTab.set('CEDULA')"
+              [ngClass]="activeTab() === 'CEDULA'
+                ? 'bg-[#E5EFFC] text-[#2B548C] border-[#7FA3D4]/70'
+                : 'bg-white dark:bg-[#14171C] text-slate-700 dark:text-slate-300 border-slate-200/90 dark:border-[#232730] hover:bg-slate-50'"
+              class="px-5 py-2.5 rounded-full text-xs font-bold border transition-colors cursor-pointer">
+              Cédula de Partido
             </button>
           </div>
         </div>
-      </div>
 
-      <!-- Pestañas de Navegación del Panel Admin -->
-      <div class="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          (click)="activeTab.set('CEDULA')"
-          [ngClass]="activeTab() === 'CEDULA'
-            ? 'bg-[#111111] dark:bg-white text-white dark:text-[#111111] border-[#111111] dark:border-white font-bold shadow-xs'
-            : 'bg-white dark:bg-[#14171C] text-slate-700 dark:text-slate-300 border-[#ECEAE6] dark:border-[#232730] font-semibold hover:border-[#111111]'"
-          class="px-4 py-2 rounded-full text-xs border transition-all cursor-pointer">
-          1. Cédula de Partido (40 min)
-        </button>
-
-        <button
-          type="button"
-          (click)="activeTab.set('JUGADORAS')"
-          [ngClass]="activeTab() === 'JUGADORAS'
-            ? 'bg-[#111111] dark:bg-white text-white dark:text-[#111111] border-[#111111] dark:border-white font-bold shadow-xs'
-            : 'bg-white dark:bg-[#14171C] text-slate-700 dark:text-slate-300 border-[#ECEAE6] dark:border-[#232730] font-semibold hover:border-[#111111]'"
-          class="px-4 py-2 rounded-full text-xs border transition-all cursor-pointer inline-flex items-center gap-2">
-          <span>2. Gestión de Jugadoras & Equipos</span>
-          <span *ngIf="pendingCount() > 0" class="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#FEF3C7] text-[#B45309]">
-            {{ pendingCount() }}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          (click)="activeTab.set('ENTRENAMIENTOS')"
-          [ngClass]="activeTab() === 'ENTRENAMIENTOS'
-            ? 'bg-[#111111] dark:bg-white text-white dark:text-[#111111] border-[#111111] dark:border-white font-bold shadow-xs'
-            : 'bg-white dark:bg-[#14171C] text-slate-700 dark:text-slate-300 border-[#ECEAE6] dark:border-[#232730] font-semibold hover:border-[#111111]'"
-          class="px-4 py-2 rounded-full text-xs border transition-all cursor-pointer">
-          3. Control de Entrenamientos
-        </button>
-      </div>
-
-      <!-- Toast de Notificación -->
-      <div *ngIf="adminAlert()" class="rounded-xl px-4 py-3 bg-[#ECFDF5] dark:bg-emerald-950/60 border border-[#A7F3D0] dark:border-emerald-800 text-xs font-bold text-[#059669] dark:text-emerald-300 flex items-center justify-between">
-        <span>✓ {{ adminAlert() }}</span>
-        <button type="button" (click)="adminAlert.set('')" class="underline cursor-pointer">Ocultar</button>
-      </div>
-
-      <!-- ================================================================= -->
-      <!-- PESTAÑA 1: CÉDULA ARBITRAL DIGITAL (40 MINUTOS, SIN EMPATES)      -->
-      <!-- ================================================================= -->
-      <form
-        *ngIf="activeTab() === 'CEDULA'"
-        [formGroup]="matchSheetForm"
-        (ngSubmit)="saveMatchSheet()"
-        class="rounded-2xl bg-white dark:bg-[#14171C] border border-[#ECEAE6] dark:border-[#232730] p-5 sm:p-6 shadow-xs space-y-4">
-        
-        <div class="flex items-start justify-between gap-2">
-          <div>
-            <h2 class="text-sm font-extrabold text-[#111111] dark:text-white">
-              Cédula Arbitral Digital (40 Minutos • Sin Empates)
-            </h2>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-              Al guardar, recalcula Tabla General (+3 pts ganador, 0 pts perdedor), Goleo, Porteras y Minutos
-            </p>
-          </div>
-          <span class="text-[11px] font-bold text-[#10B981] shrink-0">
-            Recálculo en Vivo
-          </span>
+        <!-- Mensaje de confirmación -->
+        <div *ngIf="feedbackMessage()" class="rounded-2xl px-4 py-3 bg-[#ECFDF5] border border-[#A7F3D0] text-xs font-bold text-[#059669] flex items-center justify-between">
+          <span>✓ {{ feedbackMessage() }}</span>
+          <button type="button" (click)="feedbackMessage.set('')" class="underline cursor-pointer">Cerrar</button>
         </div>
 
-        <div class="rounded-2xl bg-[#FAF9F7] dark:bg-[#0B0D10] border border-[#ECEAE6] dark:border-[#232730] p-4 space-y-3.5">
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
-            <div class="sm:col-span-4">
-              <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                EQUIPO LOCAL
-              </label>
-              <select
-                formControlName="homeTeam"
-                class="w-full px-3 py-2.5 rounded-xl text-xs font-bold bg-white dark:bg-[#14171C] border border-[#ECEAE6] dark:border-[#232730] text-[#111111] dark:text-white focus:outline-none focus:border-[#111111]">
-                <option *ngFor="let team of officialTeams" [value]="team">{{ team }}</option>
-              </select>
+        <!-- =============================================================== -->
+        <!-- PESTAÑA 1: PANEL ADMINISTRATIVO                                 -->
+        <!-- =============================================================== -->
+        <div *ngIf="activeTab() === 'PANEL'" class="space-y-6">
+
+          <!-- Cuadros interiores en BLANCO PURO -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="admin-white-card rounded-3xl p-6 space-y-1.5">
+              <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Equipos Inscritos</p>
+              <p class="text-3xl font-extrabold text-[#111111] dark:text-white">8</p>
             </div>
 
-            <div class="sm:col-span-4 flex items-center justify-center gap-2">
-              <input
-                type="number"
-                min="0"
-                max="25"
-                formControlName="homeGoals"
-                class="w-12 h-11 rounded-xl text-center text-base font-extrabold bg-white dark:bg-[#14171C] border border-[#ECEAE6] dark:border-[#232730] text-[#111111] dark:text-white focus:outline-none focus:border-[#111111]" />
-              <span class="text-sm font-bold text-slate-400">-</span>
-              <input
-                type="number"
-                min="0"
-                max="25"
-                formControlName="awayGoals"
-                class="w-12 h-11 rounded-xl text-center text-base font-extrabold bg-white dark:bg-[#14171C] border border-[#ECEAE6] dark:border-[#232730] text-[#111111] dark:text-white focus:outline-none focus:border-[#111111]" />
+            <div class="admin-white-card rounded-3xl p-6 space-y-1.5">
+              <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Solicitudes por Revisar</p>
+              <p class="text-3xl font-extrabold text-[#9F3A4B]">{{ pendingCount() }}</p>
             </div>
 
-            <div class="sm:col-span-4">
-              <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                EQUIPO VISITANTE
-              </label>
-              <select
-                formControlName="awayTeam"
-                class="w-full px-3 py-2.5 rounded-xl text-xs font-bold bg-white dark:bg-[#14171C] border border-[#ECEAE6] dark:border-[#232730] text-[#111111] dark:text-white focus:outline-none focus:border-[#111111]">
-                <option *ngFor="let team of officialTeams" [value]="team">{{ team }}</option>
-              </select>
+            <div class="admin-white-card rounded-3xl p-6 space-y-1.5">
+              <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Jornada Actual</p>
+              <p class="text-3xl font-extrabold text-[#2E5B9A]">Jornada 4</p>
             </div>
           </div>
 
-          <!-- Bloque Amarillo Tanda de Penales (#EAB308) -->
-          <div
-            [ngClass]="isDrawAt40() ? 'opacity-100 ring-2 ring-[#EAB308]/40' : 'opacity-45 pointer-events-none'"
-            class="rounded-xl bg-[#FFFBEB] dark:bg-amber-950/35 border border-[#FDE68A] dark:border-amber-800/80 px-4 py-3 flex flex-wrap items-center justify-between gap-3 transition-all">
-            <div>
-              <p class="text-xs font-extrabold text-[#92400E] dark:text-amber-300">
-                Tanda de Penales (Si empatan al min 40):
-              </p>
-              <p class="text-[11px] font-medium text-[#B45309] dark:text-amber-200/90">
-                NO existen empates • Define al ganador de los +3 puntos
-              </p>
-            </div>
-
-            <div class="flex items-center gap-2 shrink-0">
-              <span class="text-xs font-bold text-[#92400E] dark:text-amber-200">Local (</span>
-              <input
-                type="number"
-                min="0"
-                max="20"
-                formControlName="homePenalties"
-                class="w-10 h-8 rounded-lg text-center text-xs font-extrabold bg-white dark:bg-[#14171C] border border-[#FDE68A] dark:border-amber-700 text-[#111111] dark:text-white focus:outline-none" />
-              <span class="text-xs font-bold text-[#92400E] dark:text-amber-200">) - (</span>
-              <input
-                type="number"
-                min="0"
-                max="20"
-                formControlName="awayPenalties"
-                class="w-10 h-8 rounded-lg text-center text-xs font-extrabold bg-white dark:bg-[#14171C] border border-[#FDE68A] dark:border-amber-700 text-[#111111] dark:text-white focus:outline-none" />
-              <span class="text-xs font-bold text-[#92400E] dark:text-amber-200">) Visita</span>
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between text-[11px] px-1">
-            <span class="text-slate-500 dark:text-slate-400">Impacto Tabla General:</span>
-            <span class="font-bold text-[#10B981]">
-              {{ livePointsSummary() }}
-            </span>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="rounded-2xl bg-[#FAF9F7] dark:bg-[#0B0D10] border border-[#ECEAE6] dark:border-[#232730] p-4 space-y-3">
-            <h3 class="text-xs font-extrabold text-[#F43F5E]">
-              Goles & Tarjetas
-            </h3>
-
-            <div>
-              <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1.5">
-                Goleadora del Partido
-              </label>
-              <div class="flex items-center gap-2">
-                <select
-                  formControlName="topScorer"
-                  class="flex-1 px-3 py-2 rounded-xl text-xs font-bold bg-white dark:bg-[#14171C] border border-[#ECEAE6] dark:border-[#232730] text-[#111111] dark:text-white focus:outline-none">
-                  <option value="Val (Queer Goals)">Val (Queer Goals)</option>
-                  <option value="Cami (Valquirias)">Cami (Valquirias)</option>
-                  <option value="Rayo (Atlético Diversa)">Rayo (Atlético Diversa)</option>
-                  <option value="Dani P. (Queer Goals)">Dani P. (Queer Goals)</option>
-                </select>
-                <input
-                  type="number"
-                  min="0"
-                  max="15"
-                  formControlName="scorerGoals"
-                  class="w-11 h-9 rounded-xl text-center text-xs font-extrabold bg-white dark:bg-[#14171C] border border-[#ECEAE6] dark:border-[#232730] text-[#111111] dark:text-white" />
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between pt-1">
-              <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                Tarjetas (TA / TR):
-              </span>
-              <div class="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  (click)="incrementCard('yellowCards')"
-                  class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-[#FEF3C7] dark:bg-amber-950/70 text-[#B45309] dark:text-amber-300 border border-[#FDE68A] dark:border-amber-800 cursor-pointer">
-                  {{ matchSheetForm.get('yellowCards')?.value }} TA
-                </button>
-                <button
-                  type="button"
-                  (click)="incrementCard('redCards')"
-                  class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-[#FFE4E6] dark:bg-rose-950/70 text-[#E11D48] dark:text-rose-300 border border-[#FECDD3] dark:border-rose-800 cursor-pointer">
-                  {{ matchSheetForm.get('redCards')?.value }} TR
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="rounded-2xl bg-[#FAF9F7] dark:bg-[#0B0D10] border border-[#ECEAE6] dark:border-[#232730] p-4 space-y-3">
-            <h3 class="text-xs font-extrabold text-[#3B82F6]">
-              Atajadas & Cambios (40')
-            </h3>
-
-            <div>
-              <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1.5">
-                Portera & Atajadas
-              </label>
-              <div class="flex items-center gap-2">
-                <select
-                  formControlName="goalkeeper"
-                  class="flex-1 px-3 py-2 rounded-xl text-xs font-bold bg-white dark:bg-[#14171C] border border-[#ECEAE6] dark:border-[#232730] text-[#111111] dark:text-white focus:outline-none">
-                  <option value="Sofi Navarro">Sofi Navarro</option>
-                  <option value="Dani Vela">Dani Vela</option>
-                  <option value="Fer Luna">Fer Luna</option>
-                  <option value="Ale Castro">Ale Castro</option>
-                </select>
-                <input
-                  type="number"
-                  min="0"
-                  max="30"
-                  formControlName="goalkeeperSaves"
-                  class="w-11 h-9 rounded-xl text-center text-xs font-extrabold bg-white dark:bg-[#14171C] border border-[#ECEAE6] dark:border-[#232730] text-[#111111] dark:text-white" />
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1.5">
-                Minuto de Cambio (1' a 39')
-              </label>
-              <div class="flex items-center gap-2">
-                <input
-                  type="number"
-                  min="1"
-                  max="39"
-                  formControlName="subMinute"
-                  class="w-12 h-8 rounded-xl text-center text-xs font-extrabold bg-white dark:bg-[#14171C] border border-[#ECEAE6] dark:border-[#232730] text-[#111111] dark:text-white" />
-                <span class="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
-                  Sale: {{ subMinutesOut() }}' &nbsp;|&nbsp; Entra: {{ subMinutesIn() }}'
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          [disabled]="!canSaveMatch()"
-          class="w-full py-3 px-5 rounded-full bg-[#111111] dark:bg-white text-white dark:text-[#111111] text-xs font-extrabold tracking-wide shadow-md hover:shadow-[0_8px_22px_-4px_rgba(16,185,129,0.4)] disabled:opacity-45 transition-all cursor-pointer">
-          Guardar Partido y Recalcular Tabla
-        </button>
-
-        <div class="pt-2 border-t border-[#ECEAE6] dark:border-[#232730]">
-          <p class="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2">
-            Tabla General Top 4 (Actualización en Vivo — 3 pts victoria / 0 pts derrota):
-          </p>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <div
-              *ngFor="let row of standings().slice(0, 4); let idx = index"
-              class="px-3 py-2 rounded-xl bg-[#FAF9F7] dark:bg-[#0B0D10] border border-[#ECEAE6] dark:border-[#232730] flex items-center justify-between text-xs">
-              <span class="font-bold truncate">{{ idx + 1 }}. {{ row.name }}</span>
-              <span class="font-extrabold text-[#10B981] ml-1">{{ row.pts }} pts</span>
-            </div>
-          </div>
-        </div>
-      </form>
-
-      <!-- ================================================================= -->
-      <!-- PESTAÑA 2: GESTIÓN DE JUGADORAS, DORSALES Y ESTADÍSTICAS          -->
-      <!-- ================================================================= -->
-      <div *ngIf="activeTab() === 'JUGADORAS'" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-        
-        <!-- Bandeja de Altas Nuevas (5 cols) -->
-        <div class="lg:col-span-5 rounded-2xl bg-white dark:bg-[#14171C] border border-[#ECEAE6] dark:border-[#232730] p-5 shadow-xs space-y-4">
-          <div class="flex items-center justify-between">
-            <h2 class="text-sm font-extrabold text-[#111111] dark:text-white">
-              Aprobación de Altas Nuevas
-            </h2>
-            <span class="w-6 h-6 rounded-full bg-[#FEF3C7] dark:bg-amber-950 text-[#B45309] dark:text-amber-300 text-xs font-extrabold flex items-center justify-center border border-[#FDE68A] dark:border-amber-800">
-              {{ pendingCount() }}
-            </span>
-          </div>
-
-          <div class="space-y-3.5">
-            <div
-              *ngFor="let item of registrations()"
-              class="rounded-2xl bg-[#FAF9F7] dark:bg-[#0B0D10] border border-[#ECEAE6] dark:border-[#232730] p-4 space-y-3">
-              
-              <ng-container *ngIf="item.status !== 'PENDING'; else pendingCardTpl">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <p class="text-xs font-extrabold text-[#111111] dark:text-white">{{ item.fullName }}</p>
-                    <p [ngClass]="item.status === 'ACTIVE' ? 'text-[#10B981]' : 'text-[#F43F5E]'" class="text-[11px] font-semibold">
-                      {{ item.status === 'ACTIVE' ? 'Aprobada • Activa en 4.ª Edición' : 'Solicitud rechazada' }}
-                    </p>
-                  </div>
-                  <span
-                    [ngClass]="item.status === 'ACTIVE' ? 'bg-[#ECFDF5] text-[#059669]' : 'bg-[#FFF1F2] text-[#F43F5E]'"
-                    class="px-2.5 py-0.5 rounded-full text-[10px] font-bold">
-                    {{ item.status === 'ACTIVE' ? 'ACTIVA' : 'RECHAZADA' }}
-                  </span>
-                </div>
-              </ng-container>
-
-              <ng-template #pendingCardTpl>
-                <div class="flex items-start justify-between gap-2">
-                  <div>
-                    <span class="text-[11px] font-bold text-[#D97706] dark:text-amber-400 block">
-                      {{ item.registrationType === 'CAPTAIN' ? 'Registro de Equipo' : 'Registro de Jugadora' }}
-                    </span>
-                    <h3 class="text-xs font-extrabold text-[#111111] dark:text-white mt-0.5">
-                      {{ item.fullName }} <span class="font-normal text-slate-400">("{{ item.shirtName }}" #{{ item.dorsal }})</span>
-                    </h3>
-                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                      {{ item.position }} • {{ item.pronouns }}
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    (click)="toggleConfidentialDrawer(item.id)"
-                    class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-[#F5F3FF] dark:bg-purple-950/70 text-[#7C3AED] dark:text-purple-300 border border-[#DDD6FE] dark:border-purple-800 hover:bg-[#8B5CF6] hover:text-white transition-all cursor-pointer shrink-0">
-                    {{ item.drawerOpen ? 'Ocultar 🔒' : 'Expediente 🔒' }}
-                  </button>
-                </div>
-
-                <div *ngIf="item.drawerOpen" class="rounded-xl bg-[#FAF7FF] dark:bg-[#171326] border border-[#DDD6FE] dark:border-purple-800/80 p-3 text-[11px] space-y-1">
-                  <p class="font-extrabold text-[#5B21B6] dark:text-purple-200">Expediente Confidencial Protegido:</p>
-                  <p class="text-slate-700 dark:text-slate-300"><strong>Tel:</strong> {{ item.confidential.phone }} • <strong>Zona:</strong> {{ item.confidential.zone }}</p>
-                  <p class="text-slate-700 dark:text-slate-300"><strong>Emergencia:</strong> {{ item.confidential.emergencyContact }}</p>
-                  <p class="text-[#7C3AED] dark:text-purple-300"><strong>Médico:</strong> {{ item.confidential.medicalConditions }}</p>
-                </div>
-
-                <div class="flex items-center gap-2 pt-0.5">
-                  <button
-                    type="button"
-                    (click)="updateRegistrationStatus(item.id, 'ACTIVE')"
-                    class="flex-1 py-2 px-3 rounded-xl bg-[#10B981] hover:bg-[#059669] text-white text-xs font-bold shadow-xs transition-all cursor-pointer">
-                    ✓ Aprobar (Activa)
-                  </button>
-                  <button
-                    type="button"
-                    (click)="updateRegistrationStatus(item.id, 'REJECTED')"
-                    class="py-2 px-3.5 rounded-xl bg-white dark:bg-[#14171C] hover:bg-[#F43F5E] text-[#F43F5E] hover:text-white border border-[#FECDD3] dark:border-rose-800/80 text-xs font-bold transition-all cursor-pointer">
-                    Rechazar
-                  </button>
-                </div>
-              </ng-template>
-            </div>
-          </div>
-        </div>
-
-        <!-- Asignación de Dorsales y Actualización de Estadísticas (7 cols) -->
-        <div class="lg:col-span-7 rounded-2xl bg-white dark:bg-[#14171C] border border-[#ECEAE6] dark:border-[#232730] p-5 shadow-xs space-y-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-sm font-extrabold text-[#111111] dark:text-white">
-                Dorsales y Estadísticas de Jugadoras Activas
+          <!-- Cuadro interior BLANCO PURO: Solicitudes de Inscripción -->
+          <div class="admin-white-card rounded-3xl p-6 sm:p-7 space-y-5">
+            <div class="pb-3 border-b border-slate-200/80 dark:border-[#232730]">
+              <h2 class="text-base font-extrabold text-[#111111] dark:text-white">
+                Solicitudes de Inscripción de Equipos
               </h2>
-              <p class="text-[11px] text-slate-500 dark:text-slate-400">
-                Ajusta dorsal oficial, goles, asistencias, atajadas y minutos acumulados
-              </p>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-200/80 dark:border-[#232730] text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                    <th class="py-3 px-3">Equipo</th>
+                    <th class="py-3 px-3">Color</th>
+                    <th class="py-3 px-3">Capitana / Correo</th>
+                    <th class="py-3 px-3">Estatus</th>
+                    <th class="py-3 px-3 text-right">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-[#232730] text-xs">
+                  <tr *ngFor="let req of teamRequests()">
+                    <td class="py-3.5 px-3 font-extrabold text-[#111111] dark:text-white">
+                      {{ req.teamName }} <span class="text-slate-400 font-semibold">({{ req.teamCode }})</span>
+                    </td>
+                    <td class="py-3.5 px-3 text-slate-600 dark:text-slate-300">
+                      {{ req.jerseyColor }}
+                    </td>
+                    <td class="py-3.5 px-3">
+                      <p class="font-bold text-[#111111] dark:text-white">{{ req.captainName }}</p>
+                      <p class="text-[11px] text-slate-500">{{ req.email }}</p>
+                    </td>
+                    <td class="py-3.5 px-3">
+                      <span
+                        [ngClass]="{
+                          'bg-amber-50 text-amber-700 border-amber-200': req.status === 'PENDIENTE',
+                          'bg-emerald-50 text-emerald-700 border-emerald-200': req.status === 'APROBADO',
+                          'bg-rose-50 text-rose-700 border-rose-200': req.status === 'RECHAZADO'
+                        }"
+                        class="inline-flex px-3 py-1 rounded-full text-[11px] font-bold border">
+                        {{ req.status }}
+                      </span>
+                    </td>
+                    <td class="py-3.5 px-3 text-right space-x-2">
+                      <button
+                        type="button"
+                        (click)="updateRequestStatus(req.id, 'APROBADO')"
+                        class="px-3.5 py-1.5 rounded-full bg-[#ECFDF5] hover:bg-emerald-100 text-[#059669] font-bold text-[11px] transition-colors cursor-pointer">
+                        Aprobar
+                      </button>
+                      <button
+                        type="button"
+                        (click)="updateRequestStatus(req.id, 'RECHAZADO')"
+                        class="px-3.5 py-1.5 rounded-full bg-[#FFF1F2] hover:bg-rose-100 text-[#E11D48] font-bold text-[11px] transition-colors cursor-pointer">
+                        Rechazar
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="border-b border-[#ECEAE6] dark:border-[#232730] text-[10px] font-bold uppercase text-slate-400">
-                  <th class="py-2 pr-2">Jugadora / Equipo</th>
-                  <th class="py-2 px-1.5 text-center">Dorsal</th>
-                  <th class="py-2 px-1.5 text-center">Goles</th>
-                  <th class="py-2 px-1.5 text-center">Asist.</th>
-                  <th class="py-2 px-1.5 text-center">Ataj.</th>
-                  <th class="py-2 px-1.5 text-center">Min.</th>
-                  <th class="py-2 pl-2 text-right">Acción</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-[#ECEAE6] dark:divide-[#232730] text-xs">
-                <tr *ngFor="let p of activeRoster()">
-                  <td class="py-2.5 pr-2">
-                    <p class="font-extrabold text-[#111111] dark:text-white">{{ p.shirtName }}</p>
-                    <p class="text-[10px] text-slate-500">{{ p.team }} • {{ p.position }}</p>
-                  </td>
-                  <td class="py-2.5 px-1.5 text-center">
-                    <input type="number" min="1" max="99" [value]="p.dorsal"
-                      (change)="updatePlayerStat(p.id, 'dorsal', $event)"
-                      class="w-11 h-8 rounded-lg text-center font-mono font-bold bg-[#FAF9F7] dark:bg-[#0B0D10] border border-[#ECEAE6] dark:border-[#232730]" />
-                  </td>
-                  <td class="py-2.5 px-1.5 text-center">
-                    <input type="number" min="0" [value]="p.goals"
-                      (change)="updatePlayerStat(p.id, 'goals', $event)"
-                      class="w-11 h-8 rounded-lg text-center font-bold bg-[#FAF9F7] dark:bg-[#0B0D10] border border-[#ECEAE6] dark:border-[#232730]" />
-                  </td>
-                  <td class="py-2.5 px-1.5 text-center">
-                    <input type="number" min="0" [value]="p.assists"
-                      (change)="updatePlayerStat(p.id, 'assists', $event)"
-                      class="w-11 h-8 rounded-lg text-center font-bold bg-[#FAF9F7] dark:bg-[#0B0D10] border border-[#ECEAE6] dark:border-[#232730]" />
-                  </td>
-                  <td class="py-2.5 px-1.5 text-center">
-                    <input type="number" min="0" [value]="p.saves"
-                      (change)="updatePlayerStat(p.id, 'saves', $event)"
-                      class="w-11 h-8 rounded-lg text-center font-bold bg-[#FAF9F7] dark:bg-[#0B0D10] border border-[#ECEAE6] dark:border-[#232730]" />
-                  </td>
-                  <td class="py-2.5 px-1.5 text-center">
-                    <input type="number" min="0" [value]="p.minutesPlayed"
-                      (change)="updatePlayerStat(p.id, 'minutesPlayed', $event)"
-                      class="w-14 h-8 rounded-lg text-center font-bold bg-[#FAF9F7] dark:bg-[#0B0D10] border border-[#ECEAE6] dark:border-[#232730]" />
-                  </td>
-                  <td class="py-2.5 pl-2 text-right">
-                    <button
-                      type="button"
-                      (click)="notifyPlayerSaved(p)"
-                      class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-[#ECFDF5] text-[#059669] hover:bg-[#10B981] hover:text-white transition-all cursor-pointer">
-                      Guardar
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
         </div>
-      </div>
 
-      <!-- ================================================================= -->
-      <!-- PESTAÑA 3: CONTROL DE ENTRENAMIENTOS                              -->
-      <!-- ================================================================= -->
-      <div *ngIf="activeTab() === 'ENTRENAMIENTOS'" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-        
-        <!-- Formulario Alta / Edición de Entrenamiento (5 cols) -->
-        <form
-          [formGroup]="trainingForm"
-          (ngSubmit)="saveTrainingSession()"
-          class="lg:col-span-5 rounded-2xl bg-white dark:bg-[#14171C] border border-[#ECEAE6] dark:border-[#232730] p-5 shadow-xs space-y-4">
-          
-          <div>
-            <h2 class="text-sm font-extrabold text-[#111111] dark:text-white">
-              {{ editingTrainingId() ? 'Editar Sesión de Entrenamiento' : 'Nueva Sesión o Clínica' }}
-            </h2>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400">
-              Publica sesiones disponibles para inscripción de jugadoras
-            </p>
-          </div>
+        <!-- =============================================================== -->
+        <!-- PESTAÑA 2: CÉDULA ARBITRAL / DE PARTIDO                         -->
+        <!-- =============================================================== -->
+        <div *ngIf="activeTab() === 'CEDULA'" class="space-y-6">
 
-          <div class="space-y-3">
-            <div>
-              <label class="block text-xs font-bold mb-1">Título de la sesión *</label>
-              <input type="text" formControlName="title" placeholder="Ej. Clínica de Definición y Control"
-                class="w-full px-3.5 py-2 rounded-xl text-xs font-medium bg-[#FAF9F7] dark:bg-[#0B0D10] border border-[#ECEAE6] dark:border-[#232730]" />
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
+          <!-- Cuadro interior BLANCO PURO: Datos del encuentro y marcador -->
+          <div class="admin-white-card rounded-3xl p-6 sm:p-7 space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pb-4 border-b border-slate-200/80 dark:border-[#232730]">
               <div>
-                <label class="block text-xs font-bold mb-1">Categoría *</label>
-                <select formControlName="category"
-                  class="w-full px-3 py-2 rounded-xl text-xs font-semibold bg-[#FAF9F7] dark:bg-[#0B0D10] border border-[#ECEAE6] dark:border-[#232730]">
-                  <option value="Clínica Técnica">Clínica Técnica</option>
-                  <option value="Entrenamiento Abierto">Entrenamiento Abierto</option>
-                  <option value="Porteras">Porteras</option>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Jornada</label>
+                <select
+                  [(ngModel)]="selectedMatchday"
+                  class="w-full px-4 py-2.5 rounded-full text-xs font-semibold bg-slate-50 dark:bg-[#0B0D10] border border-slate-200 dark:border-[#232730]">
+                  <option value="Jornada 1">Jornada 1</option>
+                  <option value="Jornada 2">Jornada 2</option>
+                  <option value="Jornada 3">Jornada 3</option>
+                  <option value="Jornada 4">Jornada 4</option>
                 </select>
               </div>
+
               <div>
-                <label class="block text-xs font-bold mb-1">Cupo disponible *</label>
-                <input type="number" min="1" max="60" formControlName="spotsAvailable"
-                  class="w-full px-3.5 py-2 rounded-xl text-xs font-bold bg-[#FAF9F7] dark:bg-[#0B0D10] border border-[#ECEAE6] dark:border-[#232730]" />
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Equipo Local</label>
+                <input
+                  type="text"
+                  [(ngModel)]="homeTeam"
+                  class="w-full px-4 py-2.5 rounded-full text-xs font-bold bg-slate-50 dark:bg-[#0B0D10] border border-slate-200 dark:border-[#232730]" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Equipo Visitante</label>
+                <input
+                  type="text"
+                  [(ngModel)]="awayTeam"
+                  class="w-full px-4 py-2.5 rounded-full text-xs font-bold bg-slate-50 dark:bg-[#0B0D10] border border-slate-200 dark:border-[#232730]" />
               </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-bold mb-1">Fecha *</label>
-                <input type="text" formControlName="date" placeholder="Ej. Miércoles 03 Dic"
-                  class="w-full px-3.5 py-2 rounded-xl text-xs font-medium bg-[#FAF9F7] dark:bg-[#0B0D10] border border-[#ECEAE6] dark:border-[#232730]" />
+            <!-- Marcador Global -->
+            <div class="flex items-center justify-center gap-6 py-2">
+              <div class="text-center space-y-1">
+                <p class="text-xs font-extrabold text-slate-600">{{ homeTeam }}</p>
+                <p class="text-4xl font-black text-[#111111] dark:text-white">{{ totalHomeGoals() }}</p>
               </div>
-              <div>
-                <label class="block text-xs font-bold mb-1">Horario *</label>
-                <input type="text" formControlName="time" placeholder="Ej. 19:30 - 21:00 hrs"
-                  class="w-full px-3.5 py-2 rounded-xl text-xs font-medium bg-[#FAF9F7] dark:bg-[#0B0D10] border border-[#ECEAE6] dark:border-[#232730]" />
-              </div>
-            </div>
 
-            <div>
-              <label class="block text-xs font-bold mb-1">Sede / Cancha *</label>
-              <input type="text" formControlName="location" placeholder="Ej. Deportivo Benito Juárez • Cancha 2"
-                class="w-full px-3.5 py-2 rounded-xl text-xs font-medium bg-[#FAF9F7] dark:bg-[#0B0D10] border border-[#ECEAE6] dark:border-[#232730]" />
+              <span class="text-lg font-extrabold text-slate-400">VS</span>
+
+              <div class="text-center space-y-1">
+                <p class="text-xs font-extrabold text-slate-600">{{ awayTeam }}</p>
+                <p class="text-4xl font-black text-[#111111] dark:text-white">{{ totalAwayGoals() }}</p>
+              </div>
             </div>
           </div>
 
-          <div class="flex items-center gap-2 pt-1">
+          <!-- Cuadros interiores BLANCO PURO: Estadísticas por equipo -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <!-- Local -->
+            <div class="admin-white-card rounded-3xl p-6 space-y-4">
+              <h2 class="text-sm font-extrabold text-[#111111] dark:text-white pb-2 border-b border-slate-200/80 dark:border-[#232730]">
+                {{ homeTeam }} · Estadísticas individuales
+              </h2>
+
+              <table class="w-full text-xs text-left">
+                <thead>
+                  <tr class="text-[11px] text-slate-500 uppercase border-b border-slate-100">
+                    <th class="py-2">#</th>
+                    <th class="py-2">Jugadora</th>
+                    <th class="py-2 text-center">Goles</th>
+                    <th class="py-2 text-center">TA</th>
+                    <th class="py-2 text-center">TR</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-[#232730]">
+                  <tr *ngFor="let p of homePlayers()">
+                    <td class="py-2.5 font-bold text-slate-500">{{ p.dorsal }}</td>
+                    <td class="py-2.5 font-bold">{{ p.name }}</td>
+                    <td class="py-2.5 text-center">
+                      <input type="number" min="0" [(ngModel)]="p.goals" class="w-12 text-center py-1 rounded-lg bg-slate-50 border border-slate-200 font-bold" />
+                    </td>
+                    <td class="py-2.5 text-center">
+                      <input type="number" min="0" max="2" [(ngModel)]="p.yellowCards" class="w-12 text-center py-1 rounded-lg bg-amber-50/70 border border-amber-200 font-bold text-amber-800" />
+                    </td>
+                    <td class="py-2.5 text-center">
+                      <input type="number" min="0" max="1" [(ngModel)]="p.redCards" class="w-12 text-center py-1 rounded-lg bg-rose-50/70 border border-rose-200 font-bold text-rose-800" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Visitante -->
+            <div class="admin-white-card rounded-3xl p-6 space-y-4">
+              <h2 class="text-sm font-extrabold text-[#111111] dark:text-white pb-2 border-b border-slate-200/80 dark:border-[#232730]">
+                {{ awayTeam }} · Estadísticas individuales
+              </h2>
+
+              <table class="w-full text-xs text-left">
+                <thead>
+                  <tr class="text-[11px] text-slate-500 uppercase border-b border-slate-100">
+                    <th class="py-2">#</th>
+                    <th class="py-2">Jugadora</th>
+                    <th class="py-2 text-center">Goles</th>
+                    <th class="py-2 text-center">TA</th>
+                    <th class="py-2 text-center">TR</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-[#232730]">
+                  <tr *ngFor="let p of awayPlayers()">
+                    <td class="py-2.5 font-bold text-slate-500">{{ p.dorsal }}</td>
+                    <td class="py-2.5 font-bold">{{ p.name }}</td>
+                    <td class="py-2.5 text-center">
+                      <input type="number" min="0" [(ngModel)]="p.goals" class="w-12 text-center py-1 rounded-lg bg-slate-50 border border-slate-200 font-bold" />
+                    </td>
+                    <td class="py-2.5 text-center">
+                      <input type="number" min="0" max="2" [(ngModel)]="p.yellowCards" class="w-12 text-center py-1 rounded-lg bg-amber-50/70 border border-amber-200 font-bold text-amber-800" />
+                    </td>
+                    <td class="py-2.5 text-center">
+                      <input type="number" min="0" max="1" [(ngModel)]="p.redCards" class="w-12 text-center py-1 rounded-lg bg-rose-50/70 border border-rose-200 font-bold text-rose-800" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+          <!-- Botón Guardar Cédula -->
+          <div class="flex justify-end">
             <button
-              type="submit"
-              [disabled]="trainingForm.invalid"
-              class="flex-1 py-2.5 px-4 rounded-full bg-[#111111] dark:bg-white text-white dark:text-[#111111] text-xs font-extrabold disabled:opacity-45 cursor-pointer">
-              {{ editingTrainingId() ? 'Actualizar Sesión' : 'Publicar Sesión' }}
-            </button>
-            <button
-              *ngIf="editingTrainingId()"
               type="button"
-              (click)="cancelEditTraining()"
-              class="px-4 py-2.5 rounded-full text-xs font-bold border border-[#ECEAE6] dark:border-[#232730] cursor-pointer">
-              Cancelar
+              (click)="saveMatchSheet()"
+              class="px-7 py-3 rounded-full bg-[#FCE7EB] hover:bg-[#F9D5DC] text-[#8E3545] border border-[#C57B87]/60 text-xs font-extrabold tracking-wide shadow-xs transition-colors cursor-pointer">
+              Guardar Cédula Oficial
             </button>
           </div>
-        </form>
 
-        <!-- Listado de Sesiones Activas (7 cols) -->
-        <div class="lg:col-span-7 rounded-2xl bg-white dark:bg-[#14171C] border border-[#ECEAE6] dark:border-[#232730] p-5 shadow-xs space-y-4">
-          <div class="flex items-center justify-between">
-            <h2 class="text-sm font-extrabold text-[#111111] dark:text-white">
-              Sesiones y Clínicas Publicadas ({{ trainings().length }})
-            </h2>
-          </div>
-
-          <div class="space-y-3">
-            <div
-              *ngFor="let t of trainings()"
-              class="rounded-2xl bg-[#FAF9F7] dark:bg-[#0B0D10] border border-[#ECEAE6] dark:border-[#232730] p-4 flex flex-wrap items-center justify-between gap-3">
-              <div class="space-y-1">
-                <div class="flex items-center gap-2">
-                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#EFF6FF] dark:bg-blue-950/60 text-[#3B82F6]">
-                    {{ t.category }}
-                  </span>
-                  <span class="text-[11px] font-bold text-[#10B981]">
-                    {{ t.spotsAvailable }} lugares disponibles
-                  </span>
-                </div>
-                <h3 class="text-xs font-extrabold text-[#111111] dark:text-white">{{ t.title }}</h3>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400">
-                  {{ t.date }} • {{ t.time }} • {{ t.location }}
-                </p>
-              </div>
-
-              <div class="flex items-center gap-2">
-                <button
-                  type="button"
-                  (click)="editTraining(t)"
-                  class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-[#14171C] border border-[#ECEAE6] dark:border-[#232730] hover:border-[#111111] cursor-pointer">
-                  Editar
-                </button>
-                <button
-                  type="button"
-                  (click)="deleteTraining(t.id)"
-                  class="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#FFF1F2] dark:bg-rose-950/50 text-[#F43F5E] hover:bg-[#F43F5E] hover:text-white transition-all cursor-pointer">
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
 
       </div>
-
     </div>
   `
 })
 export class AdminPanelPageComponent {
-  private fb = inject(FormBuilder);
-  private router = inject(Router);
-  private authService = inject(AuthService);
+  activeTab = signal<AdminTab>('PANEL');
+  feedbackMessage = signal<string>('');
 
-  activeTab = signal<AdminTab>('CEDULA');
-  adminAlert = signal<string>('');
-  editingTrainingId = signal<string | null>(null);
-
-  officialTeams: string[] = [
-    'Queer Goals',
-    'Valquirias',
-    'F.C. Lionesses',
-    'Good Vibes',
-    'Lobas México',
-    'Atlético Diversa',
-    'Bandidas F.C.',
-    'All Stars GV',
-    'Fénix F.C.',
-    'Real Madrid',
-    'TBD United',
-    'Unknown'
-  ];
-
-  standings = signal<TeamStanding[]>([
-    { name: 'Queer Goals', pj: 8, pg: 7, pp: 1, gf: 24, gc: 7, pts: 21 },
-    { name: 'Valquirias', pj: 8, pg: 6, pp: 2, gf: 21, gc: 9, pts: 18 },
-    { name: 'F.C. Lionesses', pj: 8, pg: 6, pp: 2, gf: 19, gc: 8, pts: 18 },
-    { name: 'Good Vibes', pj: 8, pg: 5, pp: 3, gf: 17, gc: 11, pts: 15 },
-    { name: 'Lobas México', pj: 8, pg: 5, pp: 3, gf: 16, gc: 12, pts: 15 },
-    { name: 'Atlético Diversa', pj: 8, pg: 4, pp: 4, gf: 14, gc: 14, pts: 12 },
-    { name: 'Bandidas F.C.', pj: 8, pg: 4, pp: 4, gf: 13, gc: 15, pts: 12 },
-    { name: 'All Stars GV', pj: 8, pg: 4, pp: 4, gf: 12, gc: 16, pts: 12 },
-    { name: 'Fénix F.C.', pj: 8, pg: 3, pp: 5, gf: 11, gc: 17, pts: 9 },
-    { name: 'Real Madrid', pj: 8, pg: 2, pp: 6, gf: 9, gc: 18, pts: 6 },
-    { name: 'TBD United', pj: 8, pg: 2, pp: 6, gf: 8, gc: 20, pts: 6 },
-    { name: 'Unknown', pj: 8, pg: 1, pp: 7, gf: 6, gc: 23, pts: 3 }
-  ]);
-
-  registrations = signal<PendingRegistration[]>([
+  teamRequests = signal<TeamRequestItem[]>([
     {
-      id: 'reg-1',
-      registrationType: 'PLAYER',
-      fullName: 'Daniela "Dani" Pacheco',
-      shirtName: 'Dani P.',
-      dorsal: 15,
-      position: 'Media',
-      pronouns: 'Ella / She',
-      photoAuthorized: false,
-      status: 'PENDING',
-      drawerOpen: false,
-      confidential: {
-        phone: '55 3419 8820',
-        zone: 'Benito Juárez, CDMX',
-        emergencyContact: 'Laura Pacheco (Madre) — 55 8821 0043',
-        medicalConditions: 'Alergia leve a penicilina. Tipo de sangre A+.'
-      }
-    },
-    {
-      id: 'reg-2',
-      registrationType: 'CAPTAIN',
+      id: '1',
       teamName: 'Fénix F.C.',
-      fullName: 'Renata Vázquez',
-      shirtName: 'Rena',
-      dorsal: 10,
-      position: 'Delantera',
-      pronouns: 'Elle / They',
-      photoAuthorized: true,
-      status: 'PENDING',
-      drawerOpen: true,
-      confidential: {
-        phone: '55 8392 1044',
-        zone: 'Cuauhtémoc, CDMX',
-        emergencyContact: 'Sofía León (Pareja) — 55 6120 9930',
-        medicalConditions: 'Asma leve inducida por ejercicio (inhalador en mochila)'
-      }
-    }
-  ]);
-
-  activeRoster = signal<ActivePlayerRoster[]>([
-    { id: 'p-1', shirtName: 'Val', team: 'Queer Goals', position: 'Delantera', dorsal: 10, goals: 11, assists: 5, saves: 0, minutesPlayed: 310 },
-    { id: 'p-2', shirtName: 'Cami', team: 'Valquirias', position: 'Media', dorsal: 8, goals: 9, assists: 7, saves: 0, minutesPlayed: 320 },
-    { id: 'p-3', shirtName: 'Sofi Navarro', team: 'F.C. Lionesses', position: 'Portera', dorsal: 1, goals: 0, assists: 1, saves: 28, minutesPlayed: 320 },
-    { id: 'p-4', shirtName: 'Rayo', team: 'Atlético Diversa', position: 'Delantera', dorsal: 9, goals: 8, assists: 3, saves: 0, minutesPlayed: 285 }
-  ]);
-
-  trainings = signal<TrainingSession[]>([
-    {
-      id: 'tr-1',
-      title: 'Clínica de Control Orientado y Definición',
-      category: 'Clínica Técnica',
-      date: 'Miércoles 03 Dic',
-      time: '19:30 - 21:00 hrs',
-      location: 'Deportivo Benito Juárez • Cancha 2',
-      spotsAvailable: 14,
-      active: true
+      teamCode: 'FNX',
+      jerseyColor: 'Naranja / Negro',
+      captainName: 'Valeria Ríos',
+      email: 'val.rios@queergoals.mx',
+      status: 'PENDIENTE'
     },
     {
-      id: 'tr-2',
-      title: 'Sesión Especializada de Porteras (40 min)',
-      category: 'Porteras',
-      date: 'Viernes 05 Dic',
-      time: '19:00 - 20:30 hrs',
-      location: 'Cancha Sintética Narvarte',
-      spotsAvailable: 8,
-      active: true
+      id: '2',
+      teamName: 'Valquirias United',
+      teamCode: 'VLQ',
+      jerseyColor: 'Morado / Blanco',
+      captainName: 'Sofía Mendoza',
+      email: 'sofia.m@valquirias.mx',
+      status: 'APROBADO'
     }
   ]);
 
-  pendingCount = computed(() =>
-    this.registrations().filter(r => r.status === 'PENDING').length
-  );
+  selectedMatchday = 'Jornada 4';
+  homeTeam = 'Queer Goals F.C.';
+  awayTeam = 'Valquirias United';
 
-  matchSheetForm: FormGroup = this.fb.group({
-    homeTeam: ['Queer Goals', [Validators.required]],
-    awayTeam: ['Valquirias', [Validators.required]],
-    homeGoals: [2, [Validators.required, Validators.min(0)]],
-    awayGoals: [2, [Validators.required, Validators.min(0)]],
-    homePenalties: [4, [Validators.min(0)]],
-    awayPenalties: [3, [Validators.min(0)]],
-    topScorer: ['Val (Queer Goals)'],
-    scorerGoals: [2, [Validators.min(0)]],
-    yellowCards: [1, [Validators.min(0)]],
-    redCards: [0, [Validators.min(0)]],
-    goalkeeper: ['Sofi Navarro'],
-    goalkeeperSaves: [5, [Validators.min(0)]],
-    subMinute: [25, [Validators.min(1), Validators.max(39)]]
-  });
+  homePlayers = signal<PlayerEventRow[]>([
+    { dorsal: 10, name: 'Valeria Ríos', goals: 2, yellowCards: 0, redCards: 0 },
+    { dorsal: 7, name: 'Camila Torres', goals: 1, yellowCards: 1, redCards: 0 },
+    { dorsal: 4, name: 'Andrea Luna', goals: 0, yellowCards: 0, redCards: 0 }
+  ]);
 
-  trainingForm: FormGroup = this.fb.group({
-    title: ['', [Validators.required]],
-    category: ['Clínica Técnica', [Validators.required]],
-    date: ['', [Validators.required]],
-    time: ['', [Validators.required]],
-    location: ['', [Validators.required]],
-    spotsAvailable: [16, [Validators.required, Validators.min(1)]]
-  });
+  awayPlayers = signal<PlayerEventRow[]>([
+    { dorsal: 9, name: 'Sofía Mendoza', goals: 1, yellowCards: 0, redCards: 0 },
+    { dorsal: 11, name: 'Renata Cruz', goals: 0, yellowCards: 0, redCards: 0 },
+    { dorsal: 1, name: 'Daniela Ortiz', goals: 0, yellowCards: 0, redCards: 0 }
+  ]);
 
-  logout(): void {
-    this.authService.cerrarSesion();
-    this.router.navigate(['/login']);
+  pendingCount(): number {
+    return this.teamRequests().filter((t) => t.status === 'PENDIENTE').length;
   }
 
-  toggleConfidentialDrawer(id: string): void {
-    this.registrations.update(list =>
-      list.map(item =>
-        item.id === id ? { ...item, drawerOpen: !item.drawerOpen } : item
-      )
+  updateRequestStatus(id: string, status: 'APROBADO' | 'RECHAZADO'): void {
+    this.teamRequests.update((list) =>
+      list.map((item) => (item.id === id ? { ...item, status } : item))
     );
+    this.feedbackMessage.set(`Estatus de equipo actualizado a ${status}.`);
   }
 
-  updateRegistrationStatus(id: string, status: 'ACTIVE' | 'REJECTED'): void {
-    const target = this.registrations().find(r => r.id === id);
-    this.registrations.update(list =>
-      list.map(item => (item.id === id ? { ...item, status } : item))
-    );
-    if (target) {
-      if (status === 'ACTIVE') {
-        this.activeRoster.update(roster => [
-          ...roster,
-          {
-            id: `p-${Date.now()}`,
-            shirtName: target.shirtName,
-            team: target.teamName || 'Por asignar',
-            position: target.position,
-            dorsal: target.dorsal,
-            goals: 0,
-            assists: 0,
-            saves: 0,
-            minutesPlayed: 0
-          }
-        ]);
-      }
-      this.adminAlert.set(
-        status === 'ACTIVE'
-          ? `${target.fullName} aprobada como jugadora ACTIVA y agregada al roster.`
-          : `Solicitud de ${target.fullName} rechazada.`
-      );
-    }
+  totalHomeGoals(): number {
+    return this.homePlayers().reduce((acc, p) => acc + (Number(p.goals) || 0), 0);
   }
 
-  updatePlayerStat(id: string, field: keyof ActivePlayerRoster, event: Event): void {
-    const value = Number((event.target as HTMLInputElement).value ?? 0);
-    this.activeRoster.update(list =>
-      list.map(p => (p.id === id ? { ...p, [field]: value } : p))
-    );
-  }
-
-  notifyPlayerSaved(player: ActivePlayerRoster): void {
-    this.adminAlert.set(`Dorsal (#${player.dorsal}) y estadísticas de ${player.shirtName} actualizados.`);
-  }
-
-  saveTrainingSession(): void {
-    if (this.trainingForm.invalid) return;
-    const val = this.trainingForm.value;
-    const editId = this.editingTrainingId();
-
-    if (editId) {
-      this.trainings.update(list =>
-        list.map(item => (item.id === editId ? { ...item, ...val } : item))
-      );
-      this.adminAlert.set(`Sesión "${val.title}" actualizada correctamente.`);
-      this.editingTrainingId.set(null);
-    } else {
-      this.trainings.update(list => [
-        {
-          id: `tr-${Date.now()}`,
-          ...val,
-          active: true
-        },
-        ...list
-      ]);
-      this.adminAlert.set(`Nueva sesión "${val.title}" publicada para inscripción.`);
-    }
-
-    this.trainingForm.reset({ category: 'Clínica Técnica', spotsAvailable: 16 });
-  }
-
-  editTraining(session: TrainingSession): void {
-    this.editingTrainingId.set(session.id);
-    this.trainingForm.patchValue({
-      title: session.title,
-      category: session.category,
-      date: session.date,
-      time: session.time,
-      location: session.location,
-      spotsAvailable: session.spotsAvailable
-    });
-  }
-
-  cancelEditTraining(): void {
-    this.editingTrainingId.set(null);
-    this.trainingForm.reset({ category: 'Clínica Técnica', spotsAvailable: 16 });
-  }
-
-  deleteTraining(id: string): void {
-    this.trainings.update(list => list.filter(t => t.id !== id));
-    this.adminAlert.set('Sesión de entrenamiento eliminada.');
-  }
-
-  isDrawAt40(): boolean {
-    const hg = Number(this.matchSheetForm.get('homeGoals')?.value ?? 0);
-    const ag = Number(this.matchSheetForm.get('awayGoals')?.value ?? 0);
-    return hg === ag;
-  }
-
-  canSaveMatch(): boolean {
-    const home = this.matchSheetForm.get('homeTeam')?.value;
-    const away = this.matchSheetForm.get('awayTeam')?.value;
-    if (!home || !away || home === away) return false;
-
-    if (this.isDrawAt40()) {
-      const hp = Number(this.matchSheetForm.get('homePenalties')?.value ?? 0);
-      const ap = Number(this.matchSheetForm.get('awayPenalties')?.value ?? 0);
-      return hp !== ap;
-    }
-    return true;
-  }
-
-  livePointsSummary(): string {
-    const home = this.matchSheetForm.get('homeTeam')?.value;
-    const away = this.matchSheetForm.get('awayTeam')?.value;
-    const hg = Number(this.matchSheetForm.get('homeGoals')?.value ?? 0);
-    const ag = Number(this.matchSheetForm.get('awayGoals')?.value ?? 0);
-
-    if (home === away) return 'Selecciona dos equipos distintos';
-
-    if (hg > ag) {
-      return `${home} +3 pts (${hg}-${ag} en 40') • ${away} 0 pts`;
-    }
-    if (ag > hg) {
-      return `${away} +3 pts (${ag}-${hg} en 40') • ${home} 0 pts`;
-    }
-
-    const hp = Number(this.matchSheetForm.get('homePenalties')?.value ?? 0);
-    const ap = Number(this.matchSheetForm.get('awayPenalties')?.value ?? 0);
-    if (hp > ap) {
-      return `${home} +3 pts (Penales ${hp}-${ap}) • ${away} 0 pts`;
-    }
-    if (ap > hp) {
-      return `${away} +3 pts (Penales ${ap}-${hp}) • ${home} 0 pts`;
-    }
-    return 'Empate en penales: define al ganador de los +3 puntos';
-  }
-
-  subMinutesOut(): number {
-    const min = Number(this.matchSheetForm.get('subMinute')?.value ?? 25);
-    return Math.min(39, Math.max(1, min));
-  }
-
-  subMinutesIn(): number {
-    return 40 - this.subMinutesOut();
-  }
-
-  incrementCard(controlName: 'yellowCards' | 'redCards'): void {
-    const current = Number(this.matchSheetForm.get(controlName)?.value ?? 0);
-    this.matchSheetForm.patchValue({ [controlName]: current + 1 });
+  totalAwayGoals(): number {
+    return this.awayPlayers().reduce((acc, p) => acc + (Number(p.goals) || 0), 0);
   }
 
   saveMatchSheet(): void {
-    if (!this.canSaveMatch()) return;
-
-    const val = this.matchSheetForm.value;
-    const hg = Number(val.homeGoals);
-    const ag = Number(val.awayGoals);
-    const hp = Number(val.homePenalties);
-    const ap = Number(val.awayPenalties);
-
-    const homeWon = hg > ag || (hg === ag && hp > ap);
-    const winner = homeWon ? val.homeTeam : val.awayTeam;
-    const loser = homeWon ? val.awayTeam : val.homeTeam;
-
-    this.standings.update(table => {
-      const updated = table.map(team => {
-        if (team.name === val.homeTeam) {
-          return {
-            ...team,
-            pj: team.pj + 1,
-            pg: homeWon ? team.pg + 1 : team.pg,
-            pp: homeWon ? team.pp : team.pp + 1,
-            gf: team.gf + hg,
-            gc: team.gc + ag,
-            pts: homeWon ? team.pts + 3 : team.pts
-          };
-        }
-        if (team.name === val.awayTeam) {
-          return {
-            ...team,
-            pj: team.pj + 1,
-            pg: !homeWon ? team.pg + 1 : team.pg,
-            pp: !homeWon ? team.pp : team.pp + 1,
-            gf: team.gf + ag,
-            gc: team.gc + hg,
-            pts: !homeWon ? team.pts + 3 : team.pts
-          };
-        }
-        return team;
-      });
-
-      return updated.sort((a, b) => b.pts - a.pts || (b.gf - b.gc) - (a.gf - a.gc));
-    });
-
-    this.adminAlert.set(
-      `Cédula guardada: ${winner} suma +3 pts y ${loser} 0 pts. Cambio registrado (${this.subMinutesOut()}' / ${this.subMinutesIn()}').`
+    this.feedbackMessage.set(
+      `Cédula guardada: ${this.homeTeam} ${this.totalHomeGoals()} - ${this.totalAwayGoals()} ${this.awayTeam} (${this.selectedMatchday}).`
     );
   }
 }

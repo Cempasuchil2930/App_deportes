@@ -1,4 +1,32 @@
-/* Animación suave al cambiar entre Login y Registro */
+/* Marco degradado arcoíris de 3px para el cuadro principal del Login */
+.login-rainbow-frame {
+  padding: 10px;
+  border-radius: 1.65rem;
+  background: linear-gradient(
+    135deg,
+    #f43f5e 0%,
+    #f97316 20%,
+    #eab308 40%,
+    #10b981 60%,
+    #3b82f6 80%,
+    #8b5cf6 100%
+  );
+  box-shadow: 0 20px 45px -12px rgba(139, 92, 246, 0.22);
+}
+
+/* Interior cristalino de la tarjeta dentro del marco */
+.login-rainbow-inner {
+  border-radius: calc(1.65rem - 3px);
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+:host-context(.dark) .login-rainbow-inner {
+  background: rgba(20, 23, 28, 0.92);
+}
+
+/* Animación suave al cambiar de vista */
 :host {
   display: block;
   animation: fadeInView 0.25s ease-out;
@@ -15,12 +43,39 @@
   }
 }
 
-/* Brillo luminoso personalizado para botones principales */
-.btn-glow-primary {
-  transition: transform 0.18s ease, box-shadow 0.22s ease;
+/* Fondo degradado tipo aura multicolor suave (Inscribir Equipo) */
+.team-register-aura-bg {
+  background-color: #f4f6f8;
+  background-image:
+    radial-gradient(at 12% 10%, rgba(244, 63, 94, 0.36) 0px, transparent 48%),
+    radial-gradient(at 52% 6%, rgba(249, 115, 22, 0.30) 0px, transparent 50%),
+    radial-gradient(at 88% 12%, rgba(250, 204, 21, 0.34) 0px, transparent 50%),
+    radial-gradient(at 18% 55%, rgba(16, 185, 129, 0.24) 0px, transparent 52%),
+    radial-gradient(at 50% 60%, rgba(56, 189, 248, 0.24) 0px, transparent 52%),
+    radial-gradient(at 85% 65%, rgba(168, 85, 247, 0.28) 0px, transparent 52%);
 }
 
-.btn-glow-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.45);
+/* Modo oscuro compatible */
+:host-context(.dark) .team-register-aura-bg {
+  background-color: #0b0d10;
+  background-image:
+    radial-gradient(at 15% 10%, rgba(244, 63, 94, 0.18) 0px, transparent 50%),
+    radial-gradient(at 82% 12%, rgba(234, 179, 8, 0.14) 0px, transparent 50%),
+    radial-gradient(at 25% 60%, rgba(16, 185, 129, 0.14) 0px, transparent 52%),
+    radial-gradient(at 80% 65%, rgba(139, 92, 246, 0.18) 0px, transparent 52%);
+}
+
+/* Tarjetas blancas translúcidas estilo glassmorphism */
+.glass-form-card {
+  background: rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  box-shadow: 0 14px 36px -10px rgba(15, 23, 42, 0.08);
+}
+
+:host-context(.dark) .glass-form-card {
+  background: rgba(20, 23, 28, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 14px 36px -10px rgba(0, 0, 0, 0.45);
 }

@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export type UserRole = 'PUBLIC' | 'PLAYER' | 'CAPTAIN' | 'ADMIN';
+export type UserRole = 'PUBLIC' | 'CAPTAIN' | 'ADMIN';
 
 export interface SesionActiva {
   email: string;
@@ -14,6 +14,8 @@ export interface SesionActiva {
 })
 export class AuthService {
   private readonly STORAGE_KEY = 'sesionActiva';
+  readonly ADMIN_EMAIL = 'nayeli.coach@mujeresdiversas.mx';
+
   currentRole = signal<UserRole>('PUBLIC');
 
   constructor() {
@@ -34,16 +36,22 @@ export class AuthService {
     }
   }
 
-  iniciarSesion(email: string, role: UserRole, nombre?: string): void {
+  iniciarSesion(email: string, role: UserRole, nombre?: string): boolean {
+    const cleanEmail = email.trim().toLowerCase();
+
+    // Validación estricta: solo Nayeli puede entrar como Administradora
+    if (role === 'ADMIN' && cleanEmail !== this.ADMIN_EMAIL) {
+      return false;
+    }
+
     const nombresPorDefecto: Record<UserRole, string> = {
       ADMIN: 'Coach Nayeli',
-      CAPTAIN: 'Capitana',
-      PLAYER: 'Jugadora',
+      CAPTAIN: 'Capitana de Equipo',
       PUBLIC: 'Invitada'
     };
 
     const sesion: SesionActiva = {
-      email,
+      email: cleanEmail,
       role,
       nombre: nombre || nombresPorDefecto[role],
       activa: role !== 'PUBLIC'
@@ -56,6 +64,12 @@ export class AuthService {
     }
 
     this.currentRole.set(role);
+    return true;
+  }
+
+  entrarComoInvitada(): void {
+    localStorage.removeItem(this.STORAGE_KEY);
+    this.currentRole.set('PUBLIC');
   }
 
   cerrarSesion(): void {
@@ -65,9 +79,5 @@ export class AuthService {
 
   getRole(): UserRole {
     return this.currentRole();
-  }
-
-  setRole(role: UserRole): void {
-    this.iniciarSesion('', role);
   }
 }

@@ -1,4 +1,4 @@
-import { Component, Input, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService, UserRole } from '../../../core/services/auth';
@@ -78,9 +78,9 @@ import { AuthService, UserRole } from '../../../core/services/auth';
           </div>
         }
 
-        <!-- Navegación filtrada por Rol -->
+        <!-- Navegación filtrada por Rol en tiempo real -->
         <nav class="mt-6 space-y-1">
-          <!-- 1. Inicio (Todos) -->
+          <!-- 1. Inicio (Todos: Invitada, Equipo y Admin) -->
           <a
             routerLink="/home"
             routerLinkActive="bg-slate-100 dark:bg-[#1F242D] text-slate-900 dark:text-white font-semibold"
@@ -104,7 +104,7 @@ import { AuthService, UserRole } from '../../../core/services/auth';
             }
           </a>
 
-          <!-- 2. Torneo y Tablas (Todos) -->
+          <!-- 2. Torneo y Tablas (Todos: Invitada, Equipo y Admin) -->
           <a
             routerLink="/torneo"
             routerLinkActive="bg-slate-100 dark:bg-[#1F242D] text-slate-900 dark:text-white font-semibold"
@@ -128,7 +128,7 @@ import { AuthService, UserRole } from '../../../core/services/auth';
             }
           </a>
 
-          <!-- 3. Equipos -> Jugadoras (Todos, módulo Dev 1) -->
+          <!-- 3. Equipos (Todos: Invitada, Equipo y Admin) -->
           <a
             routerLink="/equipos"
             routerLinkActive="bg-slate-100 dark:bg-[#1F242D] text-slate-900 dark:text-white font-semibold"
@@ -152,8 +152,8 @@ import { AuthService, UserRole } from '../../../core/services/auth';
             }
           </a>
 
-          <!-- 4. Entrenamientos (Solo Jugadoras y Admin; oculto a Invitado) -->
-          @if (currentRole !== 'PUBLIC') {
+          <!-- 4. Entrenamientos (Solo Equipo y Admin; oculto a Invitada) -->
+          @if (currentRole() !== 'PUBLIC') {
             <a
               routerLink="/entrenamientos"
               routerLinkActive="bg-slate-100 dark:bg-[#1F242D] text-slate-900 dark:text-white font-semibold"
@@ -178,8 +178,8 @@ import { AuthService, UserRole } from '../../../core/services/auth';
             </a>
           }
 
-          <!-- 5. Panel Admin & Cédula (Exclusivo Admin) -->
-          @if (currentRole === 'ADMIN') {
+          <!-- 5. Panel Admin & Cédula (Exclusivo Administradora Nayeli) -->
+          @if (currentRole() === 'ADMIN') {
             <a
               routerLink="/admin"
               routerLinkActive="bg-slate-100 dark:bg-[#1F242D] text-slate-900 dark:text-white font-semibold"
@@ -208,7 +208,7 @@ import { AuthService, UserRole } from '../../../core/services/auth';
 
       <!-- Footer: Acción de Sesión + Modo Claro/Oscuro -->
       <div class="p-4 border-t border-slate-200 dark:border-[#232730] space-y-2">
-        @if (currentRole === 'PUBLIC') {
+        @if (currentRole() === 'PUBLIC') {
           <a
             routerLink="/login"
             class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-xs font-bold hover:opacity-90 transition"
@@ -233,7 +233,7 @@ import { AuthService, UserRole } from '../../../core/services/auth';
         } @else {
           <button
             (click)="cerrarSesion()"
-            class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-rose-200 dark:border-rose-900/40 bg-rose-50/60 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 text-xs font-bold hover:bg-rose-100 dark:hover:bg-rose-950/40 transition"
+            class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-rose-200 dark:border-rose-900/40 bg-rose-50/60 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 text-xs font-bold hover:bg-rose-100 dark:hover:bg-rose-950/40 transition cursor-pointer"
           >
             <svg
               class="w-4 h-4 shrink-0"
@@ -256,7 +256,7 @@ import { AuthService, UserRole } from '../../../core/services/auth';
 
         <button
           (click)="toggleTheme()"
-          class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-slate-200 dark:border-[#232730] text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#1B1F27] transition"
+          class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-slate-200 dark:border-[#232730] text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#1B1F27] transition cursor-pointer"
         >
           <span class="flex items-center gap-2">
             <svg
@@ -300,27 +300,24 @@ export class SidebarComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
 
-  @Input() currentRole: UserRole = 'PUBLIC';
+  // Lee directamente el Signal de AuthService en tiempo real
+  currentRole = this.authService.currentRole;
 
   collapsed = signal(false);
   isDark = signal(document.documentElement.classList.contains('dark'));
 
   roleInfo = computed(() => {
+    const role = this.currentRole();
     const map: Record<UserRole, { label: string; tag: string; badgeClass: string }> = {
       PUBLIC: {
         label: 'Visitante Invitada',
         tag: 'Invitada',
         badgeClass: 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
       },
-      PLAYER: {
-        label: 'Jugadora Oficial',
-        tag: 'Jugadora',
-        badgeClass: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300',
-      },
       CAPTAIN: {
-        label: 'Jugadora Oficial',
-        tag: 'Jugadora',
-        badgeClass: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300',
+        label: 'Equipo Oficial',
+        tag: 'Equipo',
+        badgeClass: 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300',
       },
       ADMIN: {
         label: 'Administración',
@@ -328,7 +325,7 @@ export class SidebarComponent {
         badgeClass: 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300',
       },
     };
-    return map[this.currentRole] ?? map.PUBLIC;
+    return map[role] ?? map.PUBLIC;
   });
 
   toggleTheme() {

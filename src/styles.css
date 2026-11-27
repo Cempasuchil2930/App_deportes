@@ -78,3 +78,85 @@ body {
     0 10px 25px -10px rgba(139, 92, 246, 0.22),
     0 4px 12px -4px rgba(16, 185, 129, 0.15);
 }
+/* Fondo degradado suave tipo aura (mismo del Login y Registro) */
+.team-register-aura-bg {
+  background-color: #fafafa;
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(254, 205, 211, 0.45) 0%, transparent 45%),
+    radial-gradient(circle at 88% 15%, rgba(254, 240, 138, 0.38) 0%, transparent 45%),
+    radial-gradient(circle at 85% 82%, rgba(191, 219, 254, 0.45) 0%, transparent 48%),
+    radial-gradient(circle at 18% 85%, rgba(233, 213, 255, 0.45) 0%, transparent 45%);
+}
+
+.dark .team-register-aura-bg {
+  background-color: #0b0d10;
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(244, 63, 94, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 88% 15%, rgba(234, 179, 8, 0.10) 0%, transparent 45%),
+    radial-gradient(circle at 85% 82%, rgba(59, 130, 246, 0.14) 0%, transparent 48%),
+    radial-gradient(circle at 18% 85%, rgba(139, 92, 246, 0.14) 0%, transparent 45%);
+}
+
+/* Contenedores de información en blanco sólido */
+.admin-white-card {
+  background-color: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.06);
+}
+
+.dark .admin-white-card {
+  background-color: #14171c;
+  border-color: #232730;
+}
+
+/* 1. Fondo degradado pastel en TODA la pantalla exterior */
+html,
+body {
+  min-height: 100vh;
+  background-color: #fafafa;
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(254, 205, 211, 0.52) 0%, transparent 45%),
+    radial-gradient(circle at 88% 15%, rgba(254, 240, 138, 0.45) 0%, transparent 45%),
+    radial-gradient(circle at 85% 82%, rgba(191, 219, 254, 0.52) 0%, transparent 48%),
+    radial-gradient(circle at 18% 85%, rgba(233, 213, 255, 0.52) 0%, transparent 45%);
+  background-attachment: fixed;
+}
+
+.dark html,
+.dark body {
+  background-color: #0b0d10;
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(244, 63, 94, 0.16) 0%, transparent 45%),
+    radial-gradient(circle at 88% 15%, rgba(234, 179, 8, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 85% 82%, rgba(59, 130, 246, 0.16) 0%, transparent 48%),
+    radial-gradient(circle at 18% 85%, rgba(139, 92, 246, 0.16) 0%, transparent 45%);
+}
+
+/* 2. Contenedores interiores en BLANCO PURO sólido */
+.admin-white-card {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.07);
+}
+
+.dark .admin-white-card {
+  background-color: #14171c !important;
+  border-color: #232730;
+}
+html,
+body {
+  min-height: 100vh;
+  background-color: #fafafa;
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(254, 205, 211, 0.55) 0%, transparent 45%),
+    radial-gradient(circle at 88% 15%, rgba(254, 240, 138, 0.48) 0%, transparent 45%),
+    radial-gradient(circle at 85% 82%, rgba(191, 219, 254, 0.55) 0%, transparent 48%),
+    radial-gradient(circle at 18% 85%, rgba(233, 213, 255, 0.55) 0%, transparent 45%);
+  background-attachment: fixed;
+}
+
+.admin-white-card {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.07);
+}

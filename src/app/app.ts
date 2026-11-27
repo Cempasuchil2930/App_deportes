@@ -14,8 +14,9 @@ import { AuthService } from './core/services/auth';
     @if (isAuthRoute()) {
       <router-outlet></router-outlet>
     } @else {
+      <!-- Fondo exterior con el degradado pastel aura -->
       <div
-        class="min-h-screen flex bg-[#F8FAFC] dark:bg-[#0B0D10] text-[#0F172A] dark:text-[#F8FAFC] transition-colors duration-300"
+        class="team-register-aura-bg min-h-screen flex text-[#0F172A] dark:text-[#F8FAFC] transition-colors duration-300"
       >
         @if (mobileMenuOpen()) {
           <div
@@ -28,17 +29,20 @@ import { AuthService } from './core/services/auth';
           [class]="mobileMenuOpen() ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
           class="fixed inset-y-0 left-0 z-50 md:static transition-transform duration-300 ease-in-out flex"
         >
-          <app-sidebar [currentRole]="authService.currentRole()"></app-sidebar>
+          <app-sidebar></app-sidebar>
         </div>
 
-        <div class="flex-1 flex flex-col min-w-0 bg-[#F8FAFC] dark:bg-[#0B0D10]">
-          <app-topbar
-            [currentRole]="authService.currentRole()"
-            [pageTitle]="pageTitle()"
-            (toggleMobileMenu)="mobileMenuOpen.set(!mobileMenuOpen())"
-          ></app-topbar>
+        <!-- Contenedor derecho transparente para que se vea el degradado alrededor de los cuadros blancos -->
+        <div class="flex-1 flex flex-col min-w-0 bg-transparent">
+          @if (!isAdminRoute()) {
+            <app-topbar
+              [currentRole]="authService.currentRole()"
+              [pageTitle]="pageTitle()"
+              (toggleMobileMenu)="mobileMenuOpen.set(!mobileMenuOpen())"
+            ></app-topbar>
+          }
 
-          <main class="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto">
+          <main class="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto bg-transparent">
             <router-outlet></router-outlet>
           </main>
         </div>
@@ -51,6 +55,7 @@ export class App implements OnInit {
   readonly authService = inject(AuthService);
 
   isAuthRoute = signal<boolean>(false);
+  isAdminRoute = signal<boolean>(false);
   mobileMenuOpen = signal<boolean>(false);
   pageTitle = signal<string>('Inicio & Comunidad');
 
@@ -73,6 +78,7 @@ export class App implements OnInit {
       '/recuperar-password',
     ];
     this.isAuthRoute.set(rutasSinShell.some((ruta) => url.startsWith(ruta)));
+    this.isAdminRoute.set(url.startsWith('/admin'));
 
     if (url.startsWith('/torneo')) this.pageTitle.set('Torneo y Tablas');
     else if (url.startsWith('/equipos')) this.pageTitle.set('Equipos y Plantillas');

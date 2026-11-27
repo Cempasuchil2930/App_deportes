@@ -3,18 +3,12 @@ import { Home } from './pages/home/home';
 import { roleGuard } from './core/guards/role-guard';
 
 export const routes: Routes = [
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+
   // 1. Flujos de Acceso y Registro (Sin Sidebar ni Topbar - Dev 2)
   {
     path: 'login',
     data: { view: 'LOGIN' },
-    loadComponent: () =>
-      import('./features/auth-admin/auth-register-page/auth-register-page').then(
-        (m) => m.AuthRegisterPageComponent,
-      ),
-  },
-  {
-    path: 'registro-jugadora',
-    data: { view: 'REGISTER_PLAYER' },
     loadComponent: () =>
       import('./features/auth-admin/auth-register-page/auth-register-page').then(
         (m) => m.AuthRegisterPageComponent,
@@ -42,7 +36,7 @@ export const routes: Routes = [
   {
     path: 'entrenamientos',
     canActivate: [roleGuard],
-    data: { roles: ['PLAYER', 'CAPTAIN', 'ADMIN'] },
+    data: { roles: ['CAPTAIN', 'ADMIN'] },
     loadComponent: () =>
       import('./pages/entrenamientos/entrenamientos').then((m) => m.Entrenamientos),
   },
@@ -64,5 +58,5 @@ export const routes: Routes = [
   { path: 'jugadora/:id', component: Home },
 
   // Comodín siempre al final
-  { path: '**', redirectTo: 'home' },
+  { path: '**', redirectTo: 'login' },
 ];
