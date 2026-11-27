@@ -39,7 +39,7 @@ import { LigaDataService } from '../../../shared/services/liga-data';
           <span
             class="px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-700 dark:text-amber-300 text-xs font-bold"
           >
-            12 Equipos Activos
+            {{ ligaData.equipos().length }} Equipos Activos
           </span>
         </div>
       </div>
@@ -83,12 +83,8 @@ import { LigaDataService } from '../../../shared/services/liga-data';
               <tbody class="divide-y divide-slate-100 dark:divide-[#1C2029] text-xs">
                 @for (team of ligaData.tablaOrdenada(); track team.id; let idx = $index) {
                   <tr
-                    (click)="seleccionarEquipo(team.id)"
-                    [class]="
-                      selectedTeamId() === team.id
-                        ? 'bg-purple-500/8 dark:bg-purple-500/15 cursor-pointer transition-colors'
-                        : 'hover:bg-slate-50 dark:hover:bg-[#1A1E26] cursor-pointer transition-colors'
-                    "
+                    (click)="irAEquipos()"
+                    class="hover:bg-slate-50 dark:hover:bg-[#1A1E26] cursor-pointer transition-colors"
                   >
                     <td
                       class="py-2.5 pl-5 pr-2"
@@ -214,102 +210,7 @@ import { LigaDataService } from '../../../shared/services/liga-data';
         </div>
       </div>
 
-      <!-- 3. DIRECTORIO OFICIAL DE LOS 12 EQUIPOS -->
-      <div
-        class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs"
-      >
-        <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
-          <div>
-            <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">
-              Directorio Oficial de los 12 Equipos
-            </h2>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Privacidad garantizada: se muestra únicamente apodo de camiseta, dorsal y posición
-            </p>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <span
-              class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20"
-            >
-              Datos Médicos Ocultos
-            </span>
-            <span
-              class="text-xs font-extrabold text-slate-900 dark:text-white bg-slate-100 dark:bg-[#1E222B] px-3 py-1 rounded-full"
-            >
-              {{ equipoActivo().name }}
-            </span>
-          </div>
-        </div>
-
-        <div class="flex flex-wrap gap-2 mb-5">
-          @for (team of ligaData.equipos(); track team.id) {
-            <button
-              type="button"
-              (click)="seleccionarEquipo(team.id)"
-              [class]="
-                selectedTeamId() === team.id
-                  ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white shadow-xs'
-                  : 'bg-slate-50 dark:bg-[#1B1F27] text-slate-700 dark:text-slate-300 border-slate-200 dark:border-[#2A2F3B] hover:border-slate-400'
-              "
-              class="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition border cursor-pointer"
-            >
-              <span [class]="team.color" class="w-2 h-2 rounded-full shrink-0"></span>
-              <span>{{ team.name }}</span>
-            </button>
-          }
-        </div>
-
-        <div class="border-t border-slate-100 dark:border-[#1F232D] pt-4">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-              Plantilla Registrada (Haz clic para abrir Perfil FotMob)
-            </span>
-            <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-              {{ rosterActivo().length }} jugadoras activas
-            </span>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-            @for (jugadora of rosterActivo(); track $index) {
-              <button
-                type="button"
-                (click)="irAPerfilJugadora(jugadora.playerId)"
-                class="card-hover-prism bg-slate-50/80 dark:bg-[#1A1E26] hover:bg-white dark:hover:bg-[#202530] border border-slate-200/80 dark:border-[#282D39] rounded-xl px-4 py-3 flex items-center justify-between text-left group cursor-pointer"
-              >
-                <div>
-                  <div
-                    class="text-xs font-extrabold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition"
-                  >
-                    {{ jugadora.nick }}
-                  </div>
-                  <div
-                    class="text-[11px] font-medium mt-0.5"
-                    [class]="
-                      jugadora.position === 'Portera'
-                        ? 'text-blue-600 dark:text-blue-400'
-                        : jugadora.position === 'Delantera'
-                          ? 'text-rose-500'
-                          : jugadora.position === 'Media'
-                            ? 'text-emerald-600 dark:text-emerald-400'
-                            : 'text-purple-600 dark:text-purple-400'
-                    "
-                  >
-                    {{ jugadora.position }}
-                  </div>
-                </div>
-                <span
-                  class="text-xs font-extrabold text-slate-500 dark:text-slate-400 bg-white dark:bg-[#14171C] px-2.5 py-1 rounded-lg border border-slate-200/70 dark:border-[#2A2F3B]"
-                >
-                  #{{ jugadora.dorsal }}
-                </span>
-              </button>
-            }
-          </div>
-        </div>
-      </div>
-
-      <!-- 4. RESULTADOS DOMINICALES -->
+      <!-- 3. PARTIDOS -->
       <div
         class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs"
       >
@@ -318,12 +219,14 @@ import { LigaDataService } from '../../../shared/services/liga-data';
             <div class="flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-amber-500"></span>
               <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">
-                Resultados Dominicales (40 min)
+                Partidos
               </h2>
             </div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Haz clic en un partido para desplegar la cronología (1' a 40') y tanda de penales
-            </p>
+            @if (filtroPartidos() === 'FINALIZADO') {
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Haz clic en un partido para desplegar la cronología (1' a 40') y tanda de penales
+              </p>
+            }
           </div>
 
           <div
@@ -363,8 +266,13 @@ import { LigaDataService } from '../../../shared/services/liga-data';
             >
               <button
                 type="button"
-                (click)="togglePartido(partido.id)"
-                class="w-full px-4 py-3.5 flex flex-wrap items-center justify-between gap-3 text-left hover:bg-white/80 dark:hover:bg-[#1E232D] transition cursor-pointer"
+                (click)="partido.status === 'FINALIZADO' && togglePartido(partido.id)"
+                [class]="
+                  partido.status === 'FINALIZADO'
+                    ? 'hover:bg-white/80 dark:hover:bg-[#1E232D] cursor-pointer'
+                    : 'cursor-default'
+                "
+                class="w-full px-4 py-3.5 flex flex-wrap items-center justify-between gap-3 text-left transition"
               >
                 <div class="flex items-center gap-2.5">
                   <span class="text-[11px] font-semibold text-slate-400">{{ partido.time }}</span>
@@ -390,17 +298,18 @@ import { LigaDataService } from '../../../shared/services/liga-data';
                   <span class="text-slate-800 dark:text-slate-100">{{ partido.away }}</span>
                 </div>
 
-                <div class="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
-                  @if (partido.mvp) {
-                    <span>MVP: {{ partido.mvp }}</span>
-                  }
-                  <span class="font-bold">
+                <span class="text-[11px] font-bold text-slate-400 w-3 text-right">
+                  @if (partido.status === 'FINALIZADO') {
                     {{ expandedMatchId() === partido.id ? '▴' : '▾' }}
-                  </span>
-                </div>
+                  }
+                </span>
               </button>
 
-              @if (expandedMatchId() === partido.id && partido.timeline) {
+              @if (
+                partido.status === 'FINALIZADO' &&
+                expandedMatchId() === partido.id &&
+                partido.timeline
+              ) {
                 <div
                   class="px-4 py-3 bg-white dark:bg-[#14171C] border-t border-slate-200/80 dark:border-[#262B37] space-y-2"
                 >
@@ -430,26 +339,19 @@ export class TournamentPageComponent {
   readonly ligaData = inject(LigaDataService);
   private router = inject(Router);
 
-  selectedTeamId = signal<number>(1);
   filtroPartidos = signal<'FINALIZADO' | 'PROGRAMADO'>('FINALIZADO');
   expandedMatchId = signal<number | null>(3);
-
-  readonly equipoActivo = computed(
-    () => this.ligaData.equipos().find((e) => e.id === this.selectedTeamId()) ?? this.ligaData.equipos()[0],
-  );
-
-  readonly rosterActivo = computed(() => this.ligaData.rostersPorEquipo[this.selectedTeamId()] ?? []);
 
   readonly partidosFiltrados = computed(() =>
     this.ligaData.partidos().filter((p) => p.status === this.filtroPartidos()),
   );
 
-  seleccionarEquipo(teamId: number) {
-    this.selectedTeamId.set(teamId);
-  }
-
   togglePartido(matchId: number) {
     this.expandedMatchId.update((curr) => (curr === matchId ? null : matchId));
+  }
+
+  irAEquipos() {
+    this.router.navigate(['/equipos']);
   }
 
   irAPerfilJugadora(playerId: number) {

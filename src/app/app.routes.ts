@@ -57,6 +57,14 @@ export const routes: Routes = [
   { path: 'equipos', component: Home },
   { path: 'jugadora/:id', component: Home },
 
+  {
+    path: 'equipos',
+    loadComponent: () =>
+      import('./features/competition/teams-page/teams-page').then(
+        (m) => m.TeamsPageComponent,
+      ),
+  },
+
   // Comodín siempre al final
   { path: '**', redirectTo: 'login' },
 ];
