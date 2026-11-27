@@ -1,14 +1,28 @@
-@import 'tailwindcss';
-@custom-variant dark (&:where(.dark, .dark *));
+:root {
+  --bg-page: #f8fafc;
+  --text-page: #0f172a;
+}
 
-/* Tipografía limpia global */
+html.dark {
+  --bg-page: #0b0d10;
+  --text-page: #f8fafc;
+}
+
+html,
 body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
   font-family:
     'Inter',
     system-ui,
     -apple-system,
     sans-serif;
-  @apply bg-[#F8FAFC] text-[#0F172A] dark:bg-[#0B0D10] dark:text-[#F8FAFC] transition-colors duration-300;
+  background-color: var(--bg-page);
+  color: var(--text-page);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
 /* Línea superior/divisora fluida con los 6 colores repartidos */
