@@ -1,0 +1,80 @@
+<div class="space-y-8 pb-12">
+  <!-- BANNER SUPERIOR -->
+  <section
+    class="rounded-3xl bg-white dark:bg-[#14171C] border border-slate-200 dark:border-[#232730] p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6"
+  >
+    <div class="space-y-2 max-w-xl">
+      <span
+        class="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2"
+      >
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        Catálogo Público Abierto (Sin Login Requerido)
+      </span>
+      <h1 class="text-3xl font-extrabold tracking-tight">Entrenamiento Personalizado & Coaching</h1>
+      <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        Entrena con <strong class="text-slate-900 dark:text-white">Nayeli</strong> y nuestro equipo
+        de especialistas certificadas. Programas presenciales en CDMX y servicio a domicilio
+        adaptado a tus metas y necesidades físicas.
+      </p>
+    </div>
+
+    <!-- Filtros por Disciplina -->
+    <div class="flex flex-wrap gap-2">
+      @for (cat of categories; track cat) {
+        <button
+          (click)="selectedCategory.set(cat)"
+          [class]="
+            selectedCategory() === cat
+              ? 'bg-[#0F172A] text-white dark:bg-white dark:text-[#0F172A] font-semibold'
+              : 'bg-slate-50 dark:bg-[#0B0D10] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-[#232730] hover:border-purple-400'
+          "
+          class="px-4 py-2 rounded-full text-xs transition"
+        >
+          {{ cat }}
+        </button>
+      }
+    </div>
+  </section>
+
+  <!-- TARJETAS DE ESPECIALISTAS -->
+  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    @for (item of filteredServices(); track item.coachName) {
+      <article
+        class="card-hover-prism rounded-2xl bg-white dark:bg-[#14171C] border border-slate-200 dark:border-[#232730] p-6 flex flex-col justify-between space-y-6"
+      >
+        <div class="space-y-4">
+          <span
+            [class]="item.badgeStyle"
+            class="inline-block px-3 py-1 rounded-full text-xs font-bold"
+          >
+            {{ item.discipline }}
+          </span>
+
+          <h2 class="text-lg font-extrabold text-slate-900 dark:text-white">
+            {{ item.coachName }}
+          </h2>
+
+          <div
+            class="p-3 rounded-xl bg-slate-50 dark:bg-[#0B0D10] text-xs font-medium text-slate-600 dark:text-slate-400"
+          >
+            {{ item.credentials }}
+          </div>
+
+          <p class="text-xs md:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            {{ item.description }}
+          </p>
+        </div>
+
+        <a
+          [href]="buildWhatsAppUrl(item.whatsappMsg)"
+          target="_blank"
+          rel="noopener noreferrer"
+          [class]="item.btnStyle"
+          class="w-full py-3 rounded-xl text-xs font-bold text-white text-center shadow-sm hover:opacity-95 transition"
+        >
+          Agendar vía WhatsApp ↗
+        </a>
+      </article>
+    }
+  </section>
+</div>
