@@ -742,7 +742,6 @@ export class LigaDataService {
   readonly topPorteras = [
     { rank: 1, playerId: 301, name: 'Jessica Aguilar', team: 'F.C. Lionesses', stat: '36 / 8' },
     { rank: 2, playerId: 101, name: 'Mariana López', team: 'Queer Goals', stat: '31 / 7' },
-    { rank: 3, playerId: 401, name: 'Alejandra Sánchez', team: 'Good Vibes', stat: '27 / 11' },
     { rank: 4, playerId: 201, name: 'Laura Martínez', team: 'Valquirias', stat: '25 / 9' },
   ];
 
