@@ -10,13 +10,17 @@ import { RadarChartComponent } from '../../../shared/components/radar-chart/rada
   imports: [CommonModule, RadarChartComponent],
   template: `
     <div class="space-y-5">
-      <!-- 1. SELECTOR RÁPIDO SUPERIOR DE JUGADORAS -->
+      <!-- 1. BARRA SUPERIOR DE NAVEGACIÓN Y JUGADORAS DESTACADAS -->
       <div
         class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] px-4 py-3 flex flex-wrap items-center justify-between gap-2 shadow-xs"
       >
-        <span class="text-xs font-medium text-slate-500 dark:text-slate-400">
-          Explorar Ficha Técnica:
-        </span>
+        <button
+          type="button"
+          (click)="volverAEquipos()"
+          class="text-xs font-bold text-purple-600 dark:text-purple-400 hover:underline cursor-pointer"
+        >
+          ← Volver a Equipos
+        </button>
 
         <div class="flex flex-wrap items-center gap-1.5">
           @for (p of ligaData.perfilesJugadoras; track p.id) {
@@ -36,7 +40,7 @@ import { RadarChartComponent } from '../../../shared/components/radar-chart/rada
         </div>
       </div>
 
-      <!-- 2. TARJETA PRINCIPAL DE JUGADORA ESTILO FOTMOB -->
+      <!-- 2. TARJETA PRINCIPAL DE JUGADORA -->
       <div
         class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] overflow-hidden shadow-xs"
       >
@@ -104,37 +108,9 @@ import { RadarChartComponent } from '../../../shared/components/radar-chart/rada
                   >
                     {{ player().pronouns }}
                   </span>
-
-                  @if (player().imageConsent) {
-                    <span
-                      class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 ml-1"
-                    >
-                      ✓ Imagen pública autorizada
-                    </span>
-                  } @else {
-                    <span
-                      class="text-[11px] font-semibold text-purple-600 dark:text-purple-400 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20"
-                    >
-                      Avatar protegido por privacidad
-                    </span>
-                  }
                 </div>
               </div>
             </div>
-
-            <button
-              type="button"
-              (click)="toggleSeguir()"
-              [class]="
-                isFollowing()
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-              "
-              class="btn-glow px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer"
-            >
-              <span>{{ isFollowing() ? '✓' : '+' }}</span>
-              <span>{{ isFollowing() ? 'Siguiendo' : 'Seguir Jugadora' }}</span>
-            </button>
           </div>
 
           <div class="flex items-center gap-6 border-t border-slate-100 dark:border-[#1F232D] pt-1 overflow-x-auto">
@@ -190,7 +166,7 @@ import { RadarChartComponent } from '../../../shared/components/radar-chart/rada
         </div>
       </div>
 
-      <!-- 3. CONTENIDO DINÁMICO POR PESTAÑA -->
+      <!-- 3. CONTENIDO POR PESTAÑA -->
       @if (activeTab() === 'perfil') {
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
           <div class="lg:col-span-7 flex flex-col justify-between gap-5">
@@ -333,7 +309,7 @@ import { RadarChartComponent } from '../../../shared/components/radar-chart/rada
                   <span
                     class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25"
                   >
-                    ★ MVP
+                    MVP
                   </span>
                 }
                 <span class="text-xs font-extrabold text-slate-800 dark:text-slate-200">
@@ -357,7 +333,7 @@ import { RadarChartComponent } from '../../../shared/components/radar-chart/rada
               Desglose Técnico Detallado (4.ª Edición)
             </h2>
             <span class="text-[11px] font-semibold text-purple-600 dark:text-purple-400">
-              Evaluación Coach Nayeli
+              Evaluación Oficial
             </span>
           </div>
 
@@ -421,17 +397,10 @@ export class PlayerProfilePageComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  selectedPlayerId = signal<number>(1);
+  selectedPlayerId = signal<number>(301);
   activeTab = signal<'perfil' | 'partidos' | 'estadisticas' | 'trayectoria'>('perfil');
-  followedIds = signal<number[]>([20]);
 
-  readonly player = computed(
-    () =>
-      this.ligaData.perfilesJugadoras.find((p) => p.id === this.selectedPlayerId()) ??
-      this.ligaData.perfilesJugadoras[0],
-  );
-
-  readonly isFollowing = computed(() => this.followedIds().includes(this.selectedPlayerId()));
+  readonly player = computed(() => this.ligaData.obtenerPerfilPorId(this.selectedPlayerId()));
 
   readonly radarEntries = computed(() => {
     const r = this.player().radar;
@@ -448,7 +417,7 @@ export class PlayerProfilePageComponent implements OnInit {
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
       const idParam = Number(params.get('id'));
-      if (idParam && this.ligaData.perfilesJugadoras.some((p) => p.id === idParam)) {
+      if (idParam) {
         this.selectedPlayerId.set(idParam);
       }
     });
@@ -460,10 +429,7 @@ export class PlayerProfilePageComponent implements OnInit {
     this.router.navigate(['/jugadora', id]);
   }
 
-  toggleSeguir() {
-    const id = this.selectedPlayerId();
-    this.followedIds.update((list) =>
-      list.includes(id) ? list.filter((item) => item !== id) : [...list, id],
-    );
+  volverAEquipos() {
+    this.router.navigate(['/equipos']);
   }
 }

@@ -94,6 +94,8 @@ export class App implements OnInit {
     else if (url.startsWith('/entrenamientos')) this.pageTitle.set('Entrenamientos');
     else if (url.startsWith('/jugadora')) this.pageTitle.set('Perfil Jugadora');
     else if (url.startsWith('/admin')) this.pageTitle.set('Panel Admin & Cédula');
+    else if (url.startsWith('/equipos')) this.pageTitle.set('Equipos');
+    
     else this.pageTitle.set('Inicio & Comunidad');
   }
 

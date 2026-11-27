@@ -70,6 +70,14 @@ export const routes: Routes = [
       ),
   },
 
+  {
+    path: 'equipos',
+    loadComponent: () =>
+      import('./features/competition/teams-page/teams-page').then(
+        (m) => m.TeamsPageComponent,
+      ),
+  },
+
   // Comodín siempre al final
   { path: '**', redirectTo: 'home' },
 ];
