@@ -3,12 +3,6 @@
     class="rounded-3xl bg-white dark:bg-[#14171C] border border-slate-200 dark:border-[#232730] p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6"
   >
     <div class="space-y-2 max-w-xl">
-      <span
-        class="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2"
-      >
-        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-        Catálogo Público Abierto (Sin Login Requerido)
-      </span>
       <h1 class="text-3xl font-extrabold tracking-tight">Entrenamiento Personalizado & Coaching</h1>
     </div>
 
@@ -69,17 +63,16 @@
     }
   </section>
 
-  @if (coachNotification(); as message) {
+  @if (coachNotification(); as note) {
     <div
-      class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-[#0F172A] dark:bg-white text-white dark:text-[#0F172A] border border-emerald-500/50 shadow-2xl"
+      class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-full bg-[#0B1220] text-white text-xs sm:text-sm font-semibold border border-slate-700/80 shadow-lg"
     >
-      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-      <span class="text-xs md:text-sm font-semibold">{{ message }}</span>
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
+      <span>{{ note }}</span>
       <button
         type="button"
         (click)="coachNotification.set(null)"
-        aria-label="Cerrar notificación"
-        class="ml-2 text-slate-400 hover:text-white dark:hover:text-slate-900 text-xs font-bold cursor-pointer"
+        class="ml-1 text-slate-400 hover:text-white cursor-pointer"
       >
         ✕
       </button>
