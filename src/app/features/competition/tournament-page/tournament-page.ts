@@ -27,7 +27,9 @@ import { LigaDataService } from '../../../shared/services/liga-data';
               </h1>
               <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 2 tiempos de 20 min •
-                <strong class="font-semibold text-slate-700 dark:text-slate-200">Sin empates</strong>
+                <strong class="font-semibold text-slate-700 dark:text-slate-200"
+                  >Sin empates</strong
+                >
                 (definición inmediata en tanda de penales) •
                 <strong class="font-semibold text-emerald-600 dark:text-emerald-400">3 pts</strong>
                 victoria /
@@ -109,10 +111,14 @@ import { LigaDataService } from '../../../shared/services/liga-data';
                         </span>
                       </div>
                     </td>
-                    <td class="py-2.5 px-2 text-center font-medium text-slate-600 dark:text-slate-300">
+                    <td
+                      class="py-2.5 px-2 text-center font-medium text-slate-600 dark:text-slate-300"
+                    >
                       {{ team.pj }}
                     </td>
-                    <td class="py-2.5 px-2 text-center font-bold text-emerald-600 dark:text-emerald-400">
+                    <td
+                      class="py-2.5 px-2 text-center font-bold text-emerald-600 dark:text-emerald-400"
+                    >
                       {{ team.pg }}
                     </td>
                     <td class="py-2.5 px-2 text-center font-medium text-rose-500/90">
@@ -124,10 +130,14 @@ import { LigaDataService } from '../../../shared/services/liga-data';
                     <td class="py-2.5 px-2 text-center text-slate-600 dark:text-slate-300">
                       {{ team.gc }}
                     </td>
-                    <td class="py-2.5 px-2 text-center font-semibold text-slate-700 dark:text-slate-300">
+                    <td
+                      class="py-2.5 px-2 text-center font-semibold text-slate-700 dark:text-slate-300"
+                    >
                       {{ team.gf - team.gc > 0 ? '+' + (team.gf - team.gc) : team.gf - team.gc }}
                     </td>
-                    <td class="py-2.5 pl-2 pr-5 text-right font-extrabold text-slate-900 dark:text-white">
+                    <td
+                      class="py-2.5 pl-2 pr-5 text-right font-extrabold text-slate-900 dark:text-white"
+                    >
                       {{ team.pg * 3 }}
                     </td>
                   </tr>
@@ -155,7 +165,7 @@ import { LigaDataService } from '../../../shared/services/liga-data';
             </div>
 
             <div class="space-y-2">
-              @for (s of ligaData.topGoleadoras; track s.rank) {
+              @for (s of ligaData.topGoleadoras(); track s.rank) {
                 <button
                   type="button"
                   (click)="irAPerfilJugadora(s.playerId)"
@@ -180,9 +190,7 @@ import { LigaDataService } from '../../../shared/services/liga-data';
             <div class="flex items-center justify-between mb-3">
               <div class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-[#3B82F6]"></span>
-                <h3 class="text-xs font-extrabold text-slate-900 dark:text-white">
-                  Mejor Portera
-                </h3>
+                <h3 class="text-xs font-extrabold text-slate-900 dark:text-white">Mejor Portera</h3>
               </div>
               <span class="text-[10px] font-bold tracking-wider text-[#3B82F6] uppercase">
                 ATAJ / GC
@@ -190,7 +198,7 @@ import { LigaDataService } from '../../../shared/services/liga-data';
             </div>
 
             <div class="space-y-2">
-              @for (k of ligaData.topPorteras; track k.rank) {
+              @for (k of ligaData.topPorteras(); track k.rank) {
                 <button
                   type="button"
                   (click)="irAPerfilJugadora(k.playerId)"
@@ -218,9 +226,7 @@ import { LigaDataService } from '../../../shared/services/liga-data';
           <div>
             <div class="flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-              <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">
-                Partidos
-              </h2>
+              <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Partidos</h2>
             </div>
             @if (filtroPartidos() === 'FINALIZADO') {
               <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">

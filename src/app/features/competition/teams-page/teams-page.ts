@@ -80,7 +80,8 @@ import { LigaDataService } from '../../../shared/services/liga-data';
                 </span>
               </div>
               <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                4.ª Edición • Liga de Fútbol Mujeres Diversas México • {{ rosterActivo().length }} jugadoras registradas
+                4.ª Edición • Liga de Fútbol Mujeres Diversas México •
+                {{ rosterActivo().length }} jugadoras registradas
               </p>
             </div>
           </div>
@@ -142,7 +143,9 @@ import { LigaDataService } from '../../../shared/services/liga-data';
                   </span>
                 </div>
 
-                <div class="text-center px-3 py-1.5 rounded-lg bg-white dark:bg-[#14171C] border border-slate-200 dark:border-[#2A2F3B]">
+                <div
+                  class="text-center px-3 py-1.5 rounded-lg bg-white dark:bg-[#14171C] border border-slate-200 dark:border-[#2A2F3B]"
+                >
                   <div class="text-xs font-extrabold text-purple-600 dark:text-purple-400">
                     {{ prox.fechaHora }}
                   </div>
@@ -194,11 +197,7 @@ import { LigaDataService } from '../../../shared/services/liga-data';
                   </div>
 
                   <span
-                    [class]="
-                      m.gano
-                        ? 'bg-emerald-500 text-white'
-                        : 'bg-rose-500 text-white'
-                    "
+                    [class]="m.gano ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'"
                     class="px-2.5 py-1 rounded-lg text-xs font-extrabold font-mono shrink-0"
                   >
                     {{ m.score }}
@@ -277,7 +276,9 @@ import { LigaDataService } from '../../../shared/services/liga-data';
                           : row.team.gf - row.team.gc
                       }}
                     </td>
-                    <td class="py-2.5 pl-1.5 pr-4 text-right font-extrabold text-slate-900 dark:text-white">
+                    <td
+                      class="py-2.5 pl-1.5 pr-4 text-right font-extrabold text-slate-900 dark:text-white"
+                    >
                       {{ row.team.pg * 3 }}
                     </td>
                   </tr>
@@ -301,7 +302,9 @@ import { LigaDataService } from '../../../shared/services/liga-data';
                   (click)="irAPerfilJugadora(mejores.goleadora.playerId)"
                   class="card-hover-prism p-3 rounded-xl bg-rose-500/8 border border-rose-500/20 text-left cursor-pointer"
                 >
-                  <div class="text-[10px] font-extrabold uppercase tracking-wider text-rose-600 dark:text-rose-400">
+                  <div
+                    class="text-[10px] font-extrabold uppercase tracking-wider text-rose-600 dark:text-rose-400"
+                  >
                     Goleadora
                   </div>
                   <div class="text-xs font-extrabold text-slate-900 dark:text-white mt-1 truncate">
@@ -317,7 +320,9 @@ import { LigaDataService } from '../../../shared/services/liga-data';
                   (click)="irAPerfilJugadora(mejores.asistencias.playerId)"
                   class="card-hover-prism p-3 rounded-xl bg-emerald-500/8 border border-emerald-500/20 text-left cursor-pointer"
                 >
-                  <div class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                  <div
+                    class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400"
+                  >
                     Asistencias
                   </div>
                   <div class="text-xs font-extrabold text-slate-900 dark:text-white mt-1 truncate">
@@ -391,9 +396,7 @@ import { LigaDataService } from '../../../shared/services/liga-data';
               class="card-hover-prism px-4 py-3 rounded-xl bg-slate-50/90 dark:bg-[#1A1E26] border border-slate-200/80 dark:border-[#262B37] flex items-center justify-between gap-3 text-left group cursor-pointer"
             >
               <div class="flex items-center gap-2.5 min-w-0">
-                <span
-                  class="text-xs font-extrabold text-purple-600 dark:text-purple-400 shrink-0"
-                >
+                <span class="text-xs font-extrabold text-purple-600 dark:text-purple-400 shrink-0">
                   #{{ j.dorsal }}
                 </span>
                 <span class="text-slate-300 dark:text-slate-600 shrink-0">•</span>
@@ -440,7 +443,7 @@ export class TeamsPageComponent {
   readonly posicionActiva = computed(() => this.obtenerPosicion(this.selectedTeamId()));
 
   readonly rosterActivo = computed(
-    () => this.ligaData.rostersPorEquipo[this.selectedTeamId()] ?? [],
+    () => this.ligaData.rostersPorEquipo()[this.selectedTeamId()] ?? [],
   );
 
   readonly rosterOrdenado = computed(() =>
