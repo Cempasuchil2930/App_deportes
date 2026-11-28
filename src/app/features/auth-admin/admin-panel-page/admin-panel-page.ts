@@ -1,18 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SolicitudesEquiposService } from '../../../shared/services/solicitudes-equipos';
 
 type AdminTab = 'PANEL' | 'CEDULA';
-
-interface TeamRequestItem {
-  id: string;
-  teamName: string;
-  teamCode: string;
-  jerseyColor: string;
-  captainName: string;
-  email: string;
-  status: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO';
-}
 
 interface PlayerEventRow {
   dorsal: number;
@@ -75,7 +66,7 @@ interface PlayerEventRow {
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="admin-white-card rounded-3xl p-6 space-y-1.5">
               <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Equipos Inscritos</p>
-              <p class="text-3xl font-extrabold text-[#111111] dark:text-white">8</p>
+              <p class="text-3xl font-extrabold text-[#111111] dark:text-white">{{ approvedTeamsCount() }}</p>
             </div>
 
             <div class="admin-white-card rounded-3xl p-6 space-y-1.5">
@@ -109,26 +100,26 @@ interface PlayerEventRow {
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-[#232730] text-xs">
-                  <tr *ngFor="let req of teamRequests()">
+                  <tr *ngFor="let req of solicitudesService.solicitudes()">
                     <td class="py-3.5 px-3 font-extrabold text-[#111111] dark:text-white">
-                      {{ req.teamName }} <span class="text-slate-400 font-semibold">({{ req.teamCode }})</span>
+                      {{ req.nombreEquipo }}
                     </td>
                     <td class="py-3.5 px-3 text-slate-600 dark:text-slate-300">
-                      {{ req.jerseyColor }}
+                      {{ req.colorDistintivo }}
                     </td>
                     <td class="py-3.5 px-3">
-                      <p class="font-bold text-[#111111] dark:text-white">{{ req.captainName }}</p>
-                      <p class="text-[11px] text-slate-500">{{ req.email }}</p>
+                      <p class="font-bold text-[#111111] dark:text-white">{{ req.capitana }}</p>
+                      <p class="text-[11px] text-slate-500">{{ req.correo }}</p>
                     </td>
                     <td class="py-3.5 px-3">
                       <span
                         [ngClass]="{
-                          'bg-amber-50 text-amber-700 border-amber-200': req.status === 'PENDIENTE',
-                          'bg-emerald-50 text-emerald-700 border-emerald-200': req.status === 'APROBADO',
-                          'bg-rose-50 text-rose-700 border-rose-200': req.status === 'RECHAZADO'
+                          'bg-amber-50 text-amber-700 border-amber-200': req.estatus === 'PENDIENTE',
+                          'bg-emerald-50 text-emerald-700 border-emerald-200': req.estatus === 'APROBADO',
+                          'bg-rose-50 text-rose-700 border-rose-200': req.estatus === 'RECHAZADO'
                         }"
                         class="inline-flex px-3 py-1 rounded-full text-[11px] font-bold border">
-                        {{ req.status }}
+                        {{ req.estatus }}
                       </span>
                     </td>
                     <td class="py-3.5 px-3 text-right space-x-2">
@@ -296,29 +287,10 @@ interface PlayerEventRow {
   `
 })
 export class AdminPanelPageComponent {
+  public solicitudesService = inject(SolicitudesEquiposService);
+
   activeTab = signal<AdminTab>('PANEL');
   feedbackMessage = signal<string>('');
-
-  teamRequests = signal<TeamRequestItem[]>([
-    {
-      id: '1',
-      teamName: 'Fénix F.C.',
-      teamCode: 'FNX',
-      jerseyColor: 'Naranja / Negro',
-      captainName: 'Valeria Ríos',
-      email: 'val.rios@queergoals.mx',
-      status: 'PENDIENTE'
-    },
-    {
-      id: '2',
-      teamName: 'Valquirias United',
-      teamCode: 'VLQ',
-      jerseyColor: 'Morado / Blanco',
-      captainName: 'Sofía Mendoza',
-      email: 'sofia.m@valquirias.mx',
-      status: 'APROBADO'
-    }
-  ]);
 
   selectedMatchday = 'Jornada 4';
   homeTeam = 'Queer Goals F.C.';
@@ -337,13 +309,16 @@ export class AdminPanelPageComponent {
   ]);
 
   pendingCount(): number {
-    return this.teamRequests().filter((t) => t.status === 'PENDIENTE').length;
+    return this.solicitudesService.solicitudes().filter((t) => t.estatus === 'PENDIENTE').length;
   }
 
-  updateRequestStatus(id: string, status: 'APROBADO' | 'RECHAZADO'): void {
-    this.teamRequests.update((list) =>
-      list.map((item) => (item.id === id ? { ...item, status } : item))
-    );
+  approvedTeamsCount(): number {
+    const aprobadas = this.solicitudesService.solicitudes().filter((t) => t.estatus === 'APROBADO').length;
+    return 7 + aprobadas;
+  }
+
+  updateRequestStatus(id: number, status: 'APROBADO' | 'RECHAZADO'): void {
+    this.solicitudesService.cambiarEstatus(id, status);
     this.feedbackMessage.set(`Estatus de equipo actualizado a ${status}.`);
   }
 

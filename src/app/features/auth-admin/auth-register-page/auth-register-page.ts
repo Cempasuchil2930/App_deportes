@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth';
+import { SolicitudesEquiposService } from '../../../shared/services/solicitudes-equipos';
 
 type ActiveView = 'LOGIN' | 'REGISTER_TEAM' | 'RECOVER';
 type LoginRoleTab = 'ADMIN' | 'CAPTAIN';
@@ -36,14 +37,6 @@ type LoginRoleTab = 'ADMIN' | 'CAPTAIN';
 
             <div class="p-7 sm:p-8 space-y-6">
               <div class="text-center space-y-2">
-                <span
-                  [ngClass]="selectedLoginRole() === 'ADMIN'
-                    ? 'bg-[#FCE7EB] dark:bg-rose-950/60 text-[#9F3A4B] dark:text-rose-300'
-                    : 'bg-[#E5EFFC] dark:bg-blue-950/60 text-[#2E5B9A] dark:text-blue-300'"
-                  class="inline-flex items-center px-4 py-1 rounded-full text-[11px] font-bold">
-                  {{ selectedLoginRole() === 'ADMIN' ? 'Rol: Administradora' : 'Rol: Equipo' }}
-                </span>
-
                 <h1 class="text-2xl sm:text-[26px] font-extrabold tracking-tight text-[#111111] dark:text-white">
                   Iniciar Sesión
                 </h1>
@@ -488,6 +481,7 @@ export class AuthRegisterPageComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
+  private solicitudesService = inject(SolicitudesEquiposService);
 
   activeView = signal<ActiveView>('LOGIN');
   selectedLoginRole = signal<LoginRoleTab>('ADMIN');
@@ -580,26 +574,32 @@ export class AuthRegisterPageComponent implements OnInit {
 
   onRegisterSubmit(): void {
     if (this.registerForm.invalid) return;
-    const teamName = this.registerForm.value.teamName;
-    const registeredEmail = this.registerForm.value.email;
 
-    this.feedbackMessage.set(
-      `Solicitud de "${teamName}" enviada. Ya puedes iniciar sesión como Equipo con ${registeredEmail}.`
-    );
+    const v = this.registerForm.value;
+    const codigo = String(v.teamCode).trim().toUpperCase();
 
+    this.solicitudesService.agregarSolicitud({
+      nombreEquipo: `${String(v.teamName).trim()} (${codigo})`,
+      colorDistintivo: String(v.jerseyColor).trim(),
+      abreviatura: codigo,
+      capitana: String(v.fullName).trim(),
+      correo: String(v.email).trim(),
+      apodo: String(v.shirtName || '').trim(),
+      dorsal: Number(v.dorsal),
+      posicion: v.position,
+      pronombres: v.pronouns,
+      fotoAutorizada: Boolean(v.photoAuthorized),
+    });
+
+    this.feedbackMessage.set(`El equipo "${v.teamName}" se registró correctamente.`);
     this.registerForm.reset({
       dorsal: 10,
       position: 'Media',
       pronouns: 'Ella',
       playerStatus: 'Alta nueva',
       photoAuthorized: true,
-      privacyAccepted: false
+      privacyAccepted: false,
     });
-
-    setTimeout(() => {
-      this.selectedLoginRole.set('CAPTAIN');
-      this.loginForm.patchValue({ email: registeredEmail, password: '' });
-      this.router.navigate(['/login']);
-    }, 2000);
+    this.activeView.set('LOGIN');
   }
 }
