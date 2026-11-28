@@ -34,6 +34,7 @@
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+    <!-- TABLA GENERAL -->
     <div
       class="lg:col-span-8 bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] shadow-xs overflow-hidden"
     >
@@ -41,9 +42,9 @@
         class="px-5 py-3.5 border-b border-slate-100 dark:border-[#1F232D] flex items-center justify-between"
       >
         <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
+          <span class="w-2 h-2 rounded-full bg-[#10B981]"></span>
           <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
-            Tabla General en Vivo (Sin Empates)
+            Tabla General
           </h2>
         </div>
         <span class="text-[11px] font-medium text-slate-400"> 3 pts Victoria • 0 pts Derrota </span>
@@ -129,6 +130,7 @@
       </div>
     </div>
 
+    <!-- RANKINGS LATERALES -->
     <div class="lg:col-span-4 space-y-5">
       <div
         class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-4 shadow-xs"
@@ -196,115 +198,100 @@
     </div>
   </div>
 
+  <!-- PARTIDOS (SOLO GOLES Y PENALES) -->
   <div
-    class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs"
+    class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs space-y-4"
   >
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-          <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Partidos</h2>
-        </div>
-        @if (filtroPartidos() === 'FINALIZADO') {
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Haz clic en un partido para desplegar la cronología (1' a 40') y tanda de penales
-          </p>
-        }
-      </div>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <h2 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">Partidos</h2>
 
       <div
-        class="flex items-center gap-1 bg-slate-100 dark:bg-[#1B1F27] p-1 rounded-xl border border-slate-200/80 dark:border-[#2A2F3B]"
+        class="flex items-center gap-1.5 bg-slate-100 dark:bg-[#1A1E26] p-1 rounded-xl border border-slate-200/80 dark:border-[#252A35]"
       >
         <button
           type="button"
           (click)="filtroPartidos.set('FINALIZADO')"
           [class]="
             filtroPartidos() === 'FINALIZADO'
-              ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-bold shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 font-medium'
+              ? 'bg-purple-600 text-white'
+              : 'text-slate-600 dark:text-slate-300'
           "
-          class="px-3 py-1 rounded-lg text-xs transition cursor-pointer"
+          class="px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer"
         >
-          Jornada 08 • Finalizados
+          Resultados
         </button>
         <button
           type="button"
           (click)="filtroPartidos.set('PROGRAMADO')"
           [class]="
             filtroPartidos() === 'PROGRAMADO'
-              ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-bold shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 font-medium'
+              ? 'bg-purple-600 text-white'
+              : 'text-slate-600 dark:text-slate-300'
           "
-          class="px-3 py-1 rounded-lg text-xs transition cursor-pointer"
+          class="px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer"
         >
-          Jornada 09 • Próximos
+          Próximos
         </button>
       </div>
     </div>
 
-    <div class="space-y-3">
-      @for (partido of partidosFiltrados(); track partido.id) {
+    <div class="space-y-2.5">
+      @for (match of partidosFiltrados(); track match.id) {
         <div
-          class="rounded-xl border border-slate-200 dark:border-[#262B37] bg-slate-50/60 dark:bg-[#181C24] overflow-hidden"
+          class="rounded-xl border border-slate-200/90 dark:border-[#262B37] bg-slate-50/70 dark:bg-[#1A1E26] overflow-hidden"
         >
           <button
             type="button"
-            (click)="partido.status === 'FINALIZADO' && togglePartido(partido.id)"
-            [class]="
-              partido.status === 'FINALIZADO'
-                ? 'hover:bg-white/80 dark:hover:bg-[#1E232D] cursor-pointer'
-                : 'cursor-default'
-            "
-            class="w-full px-4 py-3.5 flex flex-wrap items-center justify-between gap-3 text-left transition"
+            (click)="togglePartido(match.id)"
+            class="w-full px-4 py-3.5 flex flex-wrap items-center justify-between gap-3 text-left hover:bg-slate-100/70 dark:hover:bg-[#202530] transition cursor-pointer"
           >
-            <div class="flex items-center gap-2.5">
-              <span class="text-[11px] font-semibold text-slate-400">{{ partido.time }}</span>
-              <span
-                [class]="
-                  partido.penalties
-                    ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/25'
-                    : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20'
-                "
-                class="px-2 py-0.5 rounded-full text-[10px] font-bold border"
-              >
-                {{ partido.penalties ? 'Penales ' + partido.penalties : partido.status }}
-              </span>
-            </div>
+            <span
+              class="px-2.5 py-0.5 rounded-md text-[11px] font-extrabold bg-slate-200/80 dark:bg-[#252A35] text-slate-700 dark:text-slate-300"
+            >
+              {{ match.round }}
+            </span>
 
-            <div class="flex items-center gap-3 text-xs font-extrabold">
-              <span class="text-slate-800 dark:text-slate-100">{{ partido.home }}</span>
-              <span
-                class="px-3 py-1 rounded-lg bg-white dark:bg-[#14171C] border border-slate-200 dark:border-[#2A2F3B] font-mono"
-              >
-                {{ partido.score || 'VS' }}
-              </span>
-              <span class="text-slate-800 dark:text-slate-100">{{ partido.away }}</span>
-            </div>
+            <div
+              class="flex items-center gap-3 text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white"
+            >
+              <span>{{ match.home }}</span>
 
-            <span class="text-[11px] font-bold text-slate-400 w-3 text-right">
-              @if (partido.status === 'FINALIZADO') {
-                {{ expandedMatchId() === partido.id ? '▴' : '▾' }}
+              @if (match.status === 'FINALIZADO') {
+                <span
+                  class="px-3 py-1 rounded-lg bg-white dark:bg-[#14171C] border border-slate-200 dark:border-[#2A2F3B] font-mono text-xs sm:text-sm"
+                >
+                  {{ match.score }}
+                </span>
+              } @else {
+                <span class="text-xs font-bold text-purple-600 dark:text-purple-400">
+                  {{ match.time }}
+                </span>
               }
+
+              <span>{{ match.away }}</span>
+            </div>
+
+            <span class="text-[11px] font-bold text-slate-400">
+              {{ expandedMatchId() === match.id ? '▲' : '▼' }}
             </span>
           </button>
 
-          @if (
-            partido.status === 'FINALIZADO' && expandedMatchId() === partido.id && partido.timeline
-          ) {
+          @if (expandedMatchId() === match.id && match.status === 'FINALIZADO') {
             <div
-              class="px-4 py-3 bg-white dark:bg-[#14171C] border-t border-slate-200/80 dark:border-[#262B37] space-y-2"
+              class="px-4 py-3.5 bg-white dark:bg-[#14171C] border-t border-slate-200/80 dark:border-[#232730] space-y-2 text-xs"
             >
-              <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                Cronología del Encuentro (2 × 20 min)
-              </div>
-              @for (ev of partido.timeline; track $index) {
-                <div class="flex items-center gap-3 text-xs">
-                  <span
-                    class="font-mono font-bold text-[11px] px-2 py-0.5 rounded bg-slate-100 dark:bg-[#1E222B] text-slate-700 dark:text-slate-300 w-11 text-center shrink-0"
-                  >
-                    {{ ev.min }}
-                  </span>
-                  <span class="text-slate-700 dark:text-slate-300">{{ ev.text }}</span>
+              @for (ev of match.timeline || []; track $index) {
+                <div class="flex items-center gap-2 text-slate-700 dark:text-slate-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0"></span>
+                  <span class="font-semibold">{{ ev.text }}</span>
+                </div>
+              }
+
+              @if (match.penalties) {
+                <div
+                  class="pt-2 border-t border-slate-100 dark:border-[#1F232D] font-bold text-amber-600 dark:text-amber-400"
+                >
+                  {{ match.penalties }}
                 </div>
               }
             </div>
