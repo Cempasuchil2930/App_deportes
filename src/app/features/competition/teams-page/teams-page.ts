@@ -24,7 +24,7 @@ export class TeamsPageComponent {
   readonly posicionActiva = computed(() => this.obtenerPosicion(this.selectedTeamId()));
 
   readonly rosterActivo = computed(
-    () => this.ligaData.rostersPorEquipo[this.selectedTeamId()] ?? [],
+    () => this.ligaData.rostersPorEquipo()[this.selectedTeamId()] ?? [],
   );
 
   readonly rosterOrdenado = computed(() =>
