@@ -44,360 +44,376 @@
     </div>
   </div>
 
-  <div
-    class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] overflow-hidden shadow-xs"
-  >
-    <div class="prism-hairline w-full"></div>
-    <div class="p-5 flex flex-wrap items-center justify-between gap-4">
-      <div class="flex items-center gap-4">
-        <div
-          [class]="equipoActivo().color"
-          class="w-14 h-14 rounded-2xl text-white font-extrabold text-base flex items-center justify-center shadow-sm shrink-0"
-        >
-          {{ equipoActivo().abbr }}
-        </div>
-        <div>
-          <div class="flex flex-wrap items-center gap-2.5">
-            <h1 class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white">
-              {{ equipoActivo().name }}
-            </h1>
-            <span
-              class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20"
-            >
-              Posición #{{ posicionActiva() }}
-            </span>
+  @if (equipoActivo(); as equipo) {
+    <div
+      class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] overflow-hidden shadow-xs"
+    >
+      <div class="prism-hairline w-full"></div>
+      <div class="p-5 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div
+            [class]="equipo.color"
+            class="w-14 h-14 rounded-2xl text-white font-extrabold text-base flex items-center justify-center shadow-sm shrink-0"
+          >
+            {{ equipo.abbr }}
           </div>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            4.ª Edición • Liga de Fútbol Mujeres Diversas México •
-            {{ rosterActivo().length }} jugadoras registradas
-          </p>
+          <div>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <h1 class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white">
+                {{ equipo.name }}
+              </h1>
+              <span
+                class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20"
+              >
+                Posición #{{ posicionActiva() }}
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              4.ª Edición • Liga de Fútbol Mujeres Diversas México •
+              {{ rosterActivo().length }} jugadoras registradas
+            </p>
+          </div>
         </div>
-      </div>
 
-      <div class="flex items-center gap-3 text-xs">
-        <div
-          class="px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-[#1A1E26] border border-slate-200/80 dark:border-[#262B37] text-center"
-        >
-          <div class="text-[10px] font-bold uppercase text-slate-400">Puntos</div>
-          <div class="text-sm font-extrabold text-slate-900 dark:text-white">
-            {{ equipoActivo().pg * 3 }}
+        <div class="flex items-center gap-3 text-xs">
+          <div
+            class="px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-[#1A1E26] border border-slate-200/80 dark:border-[#262B37] text-center"
+          >
+            <div class="text-[10px] font-bold uppercase text-slate-400">Puntos</div>
+            <div class="text-sm font-extrabold text-slate-900 dark:text-white">
+              {{ equipo.pg * 3 }}
+            </div>
           </div>
-        </div>
-        <div
-          class="px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-[#1A1E26] border border-slate-200/80 dark:border-[#262B37] text-center"
-        >
-          <div class="text-[10px] font-bold uppercase text-slate-400">Récord</div>
-          <div class="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">
-            {{ equipoActivo().pg }}G - {{ equipoActivo().pp }}P
+          <div
+            class="px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-[#1A1E26] border border-slate-200/80 dark:border-[#262B37] text-center"
+          >
+            <div class="text-[10px] font-bold uppercase text-slate-400">Récord</div>
+            <div class="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">
+              {{ equipo.pg }}G - {{ equipo.pp }}P
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-    <div class="lg:col-span-7 space-y-5">
-      <div
-        class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs"
-      >
-        <div class="flex items-center justify-between mb-3.5">
-          <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-            <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
-              Partido Siguiente
-            </h2>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+      <div class="lg:col-span-7 space-y-5">
+        <div
+          class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs"
+        >
+          <div class="flex items-center justify-between mb-3.5">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+              <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+                Partido Siguiente
+              </h2>
+            </div>
+            <span class="text-[11px] font-semibold text-slate-400">
+              {{ equipo.proximoPartido?.jornada || 'Jornada 09' }} • 40 min sin empates
+            </span>
           </div>
-          <span class="text-[11px] font-semibold text-slate-400">
-            {{ equipoActivo().proximoPartido?.jornada || 'Jornada 09' }} • 40 min sin empates
-          </span>
+
+          @if (equipo.proximoPartido; as prox) {
+            <div
+              class="rounded-xl bg-slate-50 dark:bg-[#1A1E26] border border-slate-200/80 dark:border-[#262B37] p-4 flex flex-wrap items-center justify-between gap-4"
+            >
+              <div class="flex items-center gap-2.5">
+                <span
+                  [class]="equipo.color"
+                  class="w-8 h-8 rounded-lg text-white text-[11px] font-extrabold flex items-center justify-center"
+                >
+                  {{ equipo.abbr }}
+                </span>
+                <span class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+                  {{ prox.local ? equipo.name : prox.rival }}
+                </span>
+              </div>
+
+              <div
+                class="text-center px-3 py-1.5 rounded-lg bg-white dark:bg-[#14171C] border border-slate-200 dark:border-[#2A2F3B]"
+              >
+                <div class="text-xs font-extrabold text-purple-600 dark:text-purple-400">
+                  {{ prox.fechaHora }}
+                </div>
+                <div class="text-[10px] font-medium text-slate-400">{{ prox.cancha }}</div>
+              </div>
+
+              <div class="flex items-center gap-2.5">
+                <span class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+                  {{ prox.local ? prox.rival : equipo.name }}
+                </span>
+              </div>
+            </div>
+          } @else {
+            <div
+              class="px-3.5 py-3 rounded-xl bg-slate-50 dark:bg-[#1A1E26] border border-slate-100 dark:border-[#252A35] text-xs text-slate-500 dark:text-slate-400"
+            >
+              Por programar en la próxima jornada dominical
+            </div>
+          }
         </div>
 
-        @if (equipoActivo().proximoPartido; as prox) {
-          <div
-            class="rounded-xl bg-slate-50 dark:bg-[#1A1E26] border border-slate-200/80 dark:border-[#262B37] p-4 flex flex-wrap items-center justify-between gap-4"
-          >
-            <div class="flex items-center gap-2.5">
-              <span
-                [class]="equipoActivo().color"
-                class="w-8 h-8 rounded-lg text-white text-[11px] font-extrabold flex items-center justify-center"
+        <div
+          class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs"
+        >
+          <div class="flex items-center justify-between mb-3.5">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+                Últimos Partidos
+              </h2>
+            </div>
+            <span class="text-[11px] text-slate-400">Últimos 5 encuentros</span>
+          </div>
+
+          <div class="space-y-2.5">
+            @for (m of equipo.ultimosPartidos || []; track $index) {
+              <div
+                class="px-3.5 py-2.5 rounded-xl bg-slate-50/80 dark:bg-[#1A1E26] border border-slate-100 dark:border-[#252A35] flex items-center justify-between gap-3"
               >
-                {{ equipoActivo().abbr }}
-              </span>
-              <span class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
-                {{ prox.local ? equipoActivo().name : prox.rival }}
-              </span>
-            </div>
+                <div class="flex items-center gap-3 min-w-0">
+                  <span
+                    class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-slate-200/80 dark:bg-[#252A35] text-slate-700 dark:text-slate-300 shrink-0"
+                  >
+                    {{ m.jornada }}
+                  </span>
+                  <div class="truncate">
+                    <div class="text-xs font-bold text-slate-900 dark:text-white truncate">
+                      {{ equipo.name }} vs {{ m.rival }}
+                    </div>
+                    @if (m.nota) {
+                      <div class="text-[10px] text-slate-400">{{ m.nota }}</div>
+                    }
+                  </div>
+                </div>
 
-            <div
-              class="text-center px-3 py-1.5 rounded-lg bg-white dark:bg-[#14171C] border border-slate-200 dark:border-[#2A2F3B]"
-            >
-              <div class="text-xs font-extrabold text-purple-600 dark:text-purple-400">
-                {{ prox.fechaHora }}
+                <span
+                  [class]="m.gano ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'"
+                  class="px-2.5 py-1 rounded-lg text-xs font-extrabold font-mono shrink-0"
+                >
+                  {{ m.score }}
+                </span>
               </div>
-              <div class="text-[10px] font-medium text-slate-400">{{ prox.cancha }}</div>
-            </div>
+            } @empty {
+              <div
+                class="px-3.5 py-3 rounded-xl bg-slate-50 dark:bg-[#1A1E26] border border-slate-100 dark:border-[#252A35] text-xs text-slate-500 dark:text-slate-400"
+              >
+                Aún no hay encuentros finalizados registrados para este equipo
+              </div>
+            }
+          </div>
+        </div>
+      </div>
 
-            <div class="flex items-center gap-2.5">
-              <span class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
-                {{ prox.local ? prox.rival : equipoActivo().name }}
-              </span>
+      <div class="lg:col-span-5 space-y-5">
+        <div
+          class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] overflow-hidden shadow-xs"
+        >
+          <div
+            class="px-4 py-3 border-b border-slate-100 dark:border-[#1F232D] flex items-center justify-between"
+          >
+            <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+              Posición en la Tabla
+            </h2>
+            <button
+              type="button"
+              (click)="irATablaCompleta()"
+              class="text-[11px] font-bold text-purple-600 dark:text-purple-400 hover:underline cursor-pointer"
+            >
+              Ver tabla completa →
+            </button>
+          </div>
+
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr
+                class="border-b border-slate-100 dark:border-[#1F232D] text-[10px] font-bold uppercase text-slate-400"
+              >
+                <th class="py-2 pl-4 pr-1">POS</th>
+                <th class="py-2 px-2">EQUIPO</th>
+                <th class="py-2 px-1.5 text-center">PJ</th>
+                <th class="py-2 px-1.5 text-center">PG</th>
+                <th class="py-2 px-1.5 text-center">PP</th>
+                <th class="py-2 px-1.5 text-center">DG</th>
+                <th class="py-2 pl-1.5 pr-4 text-right">PTS</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-[#1C2029]">
+              @for (row of miniTablaContexto(); track row.team.id) {
+                <tr
+                  [class]="
+                    row.team.id === selectedTeamId()
+                      ? 'bg-purple-500/12 dark:bg-purple-500/20 font-extrabold'
+                      : 'text-slate-600 dark:text-slate-300'
+                  "
+                >
+                  <td class="py-2.5 pl-4 pr-1">{{ row.pos }}</td>
+                  <td class="py-2.5 px-2">
+                    <div class="flex items-center gap-2">
+                      <span
+                        [class]="row.team.color"
+                        class="w-5 h-5 rounded text-[9px] font-extrabold text-white flex items-center justify-center shrink-0"
+                      >
+                        {{ row.team.abbr }}
+                      </span>
+                      <span class="truncate">{{ row.team.name }}</span>
+                    </div>
+                  </td>
+                  <td class="py-2.5 px-1.5 text-center">{{ row.team.pj }}</td>
+                  <td class="py-2.5 px-1.5 text-center text-emerald-600 dark:text-emerald-400">
+                    {{ row.team.pg }}
+                  </td>
+                  <td class="py-2.5 px-1.5 text-center text-rose-500">{{ row.team.pp }}</td>
+                  <td class="py-2.5 px-1.5 text-center">
+                    {{
+                      row.team.gf - row.team.gc > 0
+                        ? '+' + (row.team.gf - row.team.gc)
+                        : row.team.gf - row.team.gc
+                    }}
+                  </td>
+                  <td
+                    class="py-2.5 pl-1.5 pr-4 text-right font-extrabold text-slate-900 dark:text-white"
+                  >
+                    {{ row.team.pg * 3 }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (equipo.mejoresJugadoras; as mejores) {
+          <div
+            class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-4 shadow-xs"
+          >
+            <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white mb-3">
+              Mejores Jugadoras del Equipo
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <button
+                type="button"
+                (click)="irAPerfilJugadora(mejores.goleadora.playerId)"
+                class="card-hover-prism p-3 rounded-xl bg-rose-500/8 border border-rose-500/20 text-left cursor-pointer"
+              >
+                <div
+                  class="text-[10px] font-extrabold uppercase tracking-wider text-rose-600 dark:text-rose-400"
+                >
+                  Goleadora
+                </div>
+                <div class="text-xs font-extrabold text-slate-900 dark:text-white mt-1 truncate">
+                  #{{ mejores.goleadora.dorsal }} • {{ mejores.goleadora.nombre }}
+                </div>
+                <div class="text-sm font-extrabold text-rose-600 dark:text-rose-400 mt-1">
+                  {{ mejores.goleadora.goles }} Goles
+                </div>
+              </button>
+
+              <button
+                type="button"
+                (click)="irAPerfilJugadora(mejores.asistencias.playerId)"
+                class="card-hover-prism p-3 rounded-xl bg-emerald-500/8 border border-emerald-500/20 text-left cursor-pointer"
+              >
+                <div
+                  class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400"
+                >
+                  Asistencias
+                </div>
+                <div class="text-xs font-extrabold text-slate-900 dark:text-white mt-1 truncate">
+                  #{{ mejores.asistencias.dorsal }} • {{ mejores.asistencias.nombre }}
+                </div>
+                <div class="text-sm font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">
+                  {{ mejores.asistencias.asistencias }} Asistencias
+                </div>
+              </button>
             </div>
           </div>
         }
-      </div>
 
-      <div
-        class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs"
-      >
-        <div class="flex items-center justify-between mb-3.5">
-          <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
-              Últimos Partidos
-            </h2>
-          </div>
-          <span class="text-[11px] text-slate-400">Últimos 5 encuentros</span>
-        </div>
+        <div
+          class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-4 shadow-xs"
+        >
+          <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white mb-3">
+            Trofeos
+          </h2>
 
-        <div class="space-y-2.5">
-          @for (m of equipoActivo().ultimosPartidos || []; track $index) {
-            <div
-              class="px-3.5 py-2.5 rounded-xl bg-slate-50/80 dark:bg-[#1A1E26] border border-slate-100 dark:border-[#252A35] flex items-center justify-between gap-3"
-            >
-              <div class="flex items-center gap-3 min-w-0">
-                <span
-                  class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-slate-200/80 dark:bg-[#252A35] text-slate-700 dark:text-slate-300 shrink-0"
+          @if ((equipo.trofeos?.length || 0) > 0) {
+            <div class="space-y-2">
+              @for (t of equipo.trofeos; track $index) {
+                <div
+                  class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-amber-500/8 border border-amber-500/20"
                 >
-                  {{ m.jornada }}
-                </span>
-                <div class="truncate">
-                  <div class="text-xs font-bold text-slate-900 dark:text-white truncate">
-                    {{ equipoActivo().name }} vs {{ m.rival }}
+                  <div>
+                    <div class="text-xs font-extrabold text-slate-900 dark:text-white">
+                      {{ t.torneo }} {{ t.anio }}
+                    </div>
+                    <div class="text-[10px] text-slate-500 dark:text-slate-400">
+                      Campeón Oficial
+                    </div>
                   </div>
-                  @if (m.nota) {
-                    <div class="text-[10px] text-slate-400">{{ m.nota }}</div>
-                  }
+                  <span class="text-sm font-extrabold text-amber-600 dark:text-amber-400">
+                    {{ t.cantidad }}
+                  </span>
                 </div>
-              </div>
-
-              <span
-                [class]="m.gano ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'"
-                class="px-2.5 py-1 rounded-lg text-xs font-extrabold font-mono shrink-0"
-              >
-                {{ m.score }}
-              </span>
+              }
+            </div>
+          } @else {
+            <div
+              class="px-3.5 py-3 rounded-xl bg-slate-50 dark:bg-[#1A1E26] border border-slate-100 dark:border-[#252A35] text-xs text-slate-500 dark:text-slate-400"
+            >
+              En busca de su primer título • Participante 4.ª Edición
             </div>
           }
         </div>
       </div>
     </div>
 
-    <div class="lg:col-span-5 space-y-5">
-      <div
-        class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] overflow-hidden shadow-xs"
-      >
-        <div
-          class="px-4 py-3 border-b border-slate-100 dark:border-[#1F232D] flex items-center justify-between"
-        >
-          <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
-            Posición en la Tabla
-          </h2>
-          <button
-            type="button"
-            (click)="irATablaCompleta()"
-            class="text-[11px] font-bold text-purple-600 dark:text-purple-400 hover:underline cursor-pointer"
-          >
-            Ver tabla completa →
-          </button>
-        </div>
-
-        <table class="w-full text-left border-collapse text-xs">
-          <thead>
-            <tr
-              class="border-b border-slate-100 dark:border-[#1F232D] text-[10px] font-bold uppercase text-slate-400"
-            >
-              <th class="py-2 pl-4 pr-1">POS</th>
-              <th class="py-2 px-2">EQUIPO</th>
-              <th class="py-2 px-1.5 text-center">PJ</th>
-              <th class="py-2 px-1.5 text-center">PG</th>
-              <th class="py-2 px-1.5 text-center">PP</th>
-              <th class="py-2 px-1.5 text-center">DG</th>
-              <th class="py-2 pl-1.5 pr-4 text-right">PTS</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100 dark:divide-[#1C2029]">
-            @for (row of miniTablaContexto(); track row.team.id) {
-              <tr
-                [class]="
-                  row.team.id === selectedTeamId()
-                    ? 'bg-purple-500/12 dark:bg-purple-500/20 font-extrabold'
-                    : 'text-slate-600 dark:text-slate-300'
-                "
-              >
-                <td class="py-2.5 pl-4 pr-1">{{ row.pos }}</td>
-                <td class="py-2.5 px-2">
-                  <div class="flex items-center gap-2">
-                    <span
-                      [class]="row.team.color"
-                      class="w-5 h-5 rounded text-[9px] font-extrabold text-white flex items-center justify-center shrink-0"
-                    >
-                      {{ row.team.abbr }}
-                    </span>
-                    <span class="truncate">{{ row.team.name }}</span>
-                  </div>
-                </td>
-                <td class="py-2.5 px-1.5 text-center">{{ row.team.pj }}</td>
-                <td class="py-2.5 px-1.5 text-center text-emerald-600 dark:text-emerald-400">
-                  {{ row.team.pg }}
-                </td>
-                <td class="py-2.5 px-1.5 text-center text-rose-500">{{ row.team.pp }}</td>
-                <td class="py-2.5 px-1.5 text-center">
-                  {{
-                    row.team.gf - row.team.gc > 0
-                      ? '+' + (row.team.gf - row.team.gc)
-                      : row.team.gf - row.team.gc
-                  }}
-                </td>
-                <td
-                  class="py-2.5 pl-1.5 pr-4 text-right font-extrabold text-slate-900 dark:text-white"
-                >
-                  {{ row.team.pg * 3 }}
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
+    <div
+      class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs space-y-4"
+    >
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">
+          Equipo ({{ rosterOrdenado().length }} Integrantes)
+        </h2>
+        <span class="text-[11px] text-slate-400"> Selecciona una jugadora para ver su ficha </span>
       </div>
 
-      @if (equipoActivo().mejoresJugadoras; as mejores) {
-        <div
-          class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-4 shadow-xs"
-        >
-          <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white mb-3">
-            Mejores Jugadoras del Equipo
-          </h2>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <button
-              type="button"
-              (click)="irAPerfilJugadora(mejores.goleadora.playerId)"
-              class="card-hover-prism p-3 rounded-xl bg-rose-500/8 border border-rose-500/20 text-left cursor-pointer"
-            >
-              <div
-                class="text-[10px] font-extrabold uppercase tracking-wider text-rose-600 dark:text-rose-400"
-              >
-                Goleadora
-              </div>
-              <div class="text-xs font-extrabold text-slate-900 dark:text-white mt-1 truncate">
-                #{{ mejores.goleadora.dorsal }} • {{ mejores.goleadora.nombre }}
-              </div>
-              <div class="text-sm font-extrabold text-rose-600 dark:text-rose-400 mt-1">
-                {{ mejores.goleadora.goles }} Goles
-              </div>
-            </button>
-
-            <button
-              type="button"
-              (click)="irAPerfilJugadora(mejores.asistencias.playerId)"
-              class="card-hover-prism p-3 rounded-xl bg-emerald-500/8 border border-emerald-500/20 text-left cursor-pointer"
-            >
-              <div
-                class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400"
-              >
-                Asistencias
-              </div>
-              <div class="text-xs font-extrabold text-slate-900 dark:text-white mt-1 truncate">
-                #{{ mejores.asistencias.dorsal }} • {{ mejores.asistencias.nombre }}
-              </div>
-              <div class="text-sm font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">
-                {{ mejores.asistencias.asistencias }} Asistencias
-              </div>
-            </button>
-          </div>
-        </div>
-      }
-
-      <div
-        class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-4 shadow-xs"
-      >
-        <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white mb-3">
-          Trofeos
-        </h2>
-
-        @if ((equipoActivo().trofeos?.length || 0) > 0) {
-          <div class="space-y-2">
-            @for (t of equipoActivo().trofeos; track $index) {
-              <div
-                class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-amber-500/8 border border-amber-500/20"
-              >
-                <div>
-                  <div class="text-xs font-extrabold text-slate-900 dark:text-white">
-                    {{ t.torneo }} {{ t.anio }}
-                  </div>
-                  <div class="text-[10px] text-slate-500 dark:text-slate-400">Campeón Oficial</div>
-                </div>
-                <span class="text-sm font-extrabold text-amber-600 dark:text-amber-400">
-                  {{ t.cantidad }}
-                </span>
-              </div>
-            }
-          </div>
-        } @else {
-          <div
-            class="px-3.5 py-3 rounded-xl bg-slate-50 dark:bg-[#1A1E26] border border-slate-100 dark:border-[#252A35] text-xs text-slate-500 dark:text-slate-400"
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+        @for (j of rosterOrdenado(); track j.playerId) {
+          <button
+            type="button"
+            (click)="irAPerfilJugadora(j.playerId)"
+            class="card-hover-prism px-4 py-3 rounded-xl bg-slate-50/90 dark:bg-[#1A1E26] border border-slate-200/80 dark:border-[#262B37] flex items-center justify-between gap-3 text-left group cursor-pointer"
           >
-            En busca de su primer título • Participante 4.ª Edición
-          </div>
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="text-xs font-extrabold text-purple-600 dark:text-purple-400 shrink-0">
+                #{{ j.dorsal }}
+              </span>
+              <span class="text-slate-300 dark:text-slate-600 shrink-0">•</span>
+              <span
+                class="text-xs font-bold text-slate-800 dark:text-slate-100 group-hover:text-purple-600 dark:group-hover:text-purple-400 truncate"
+              >
+                {{ j.nick }}
+              </span>
+            </div>
+
+            <span
+              class="text-[11px] font-semibold shrink-0"
+              [class]="
+                j.position === 'Portera'
+                  ? 'text-blue-600 dark:text-blue-400'
+                  : j.position === 'Delantera'
+                    ? 'text-rose-500'
+                    : j.position === 'Media'
+                      ? 'text-emerald-600 dark:text-emerald-400'
+                      : 'text-purple-600 dark:text-purple-400'
+              "
+            >
+              {{ j.position }}
+            </span>
+          </button>
         }
       </div>
     </div>
-  </div>
-
-  <div
-    class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs space-y-4"
-  >
-    <div class="flex items-center justify-between">
-      <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">
-        Equipo ({{ rosterOrdenado().length }} Integrantes)
-      </h2>
-      <span class="text-[11px] text-slate-400"> Selecciona una jugadora para ver su ficha </span>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-      @for (j of rosterOrdenado(); track j.playerId) {
-        <button
-          type="button"
-          (click)="irAPerfilJugadora(j.playerId)"
-          class="card-hover-prism px-4 py-3 rounded-xl bg-slate-50/90 dark:bg-[#1A1E26] border border-slate-200/80 dark:border-[#262B37] flex items-center justify-between gap-3 text-left group cursor-pointer"
-        >
-          <div class="flex items-center gap-2.5 min-w-0">
-            <span class="text-xs font-extrabold text-purple-600 dark:text-purple-400 shrink-0">
-              #{{ j.dorsal }}
-            </span>
-            <span class="text-slate-300 dark:text-slate-600 shrink-0">•</span>
-            <span
-              class="text-xs font-bold text-slate-800 dark:text-slate-100 group-hover:text-purple-600 dark:group-hover:text-purple-400 truncate"
-            >
-              {{ j.nick }}
-            </span>
-          </div>
-
-          <span
-            class="text-[11px] font-semibold shrink-0"
-            [class]="
-              j.position === 'Portera'
-                ? 'text-blue-600 dark:text-blue-400'
-                : j.position === 'Delantera'
-                  ? 'text-rose-500'
-                  : j.position === 'Media'
-                    ? 'text-emerald-600 dark:text-emerald-400'
-                    : 'text-purple-600 dark:text-purple-400'
-            "
-          >
-            {{ j.position }}
-          </span>
-        </button>
-      }
-    </div>
-  </div>
+  }
 </div>

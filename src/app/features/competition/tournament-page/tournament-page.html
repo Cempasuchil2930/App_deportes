@@ -144,7 +144,7 @@
         </div>
 
         <div class="space-y-2">
-          @for (s of ligaData.topGoleadoras; track s.rank) {
+          @for (s of ligaData.topGoleadoras(); track s.rank) {
             <button
               type="button"
               (click)="irAPerfilJugadora(s.playerId)"
@@ -176,7 +176,7 @@
         </div>
 
         <div class="space-y-2">
-          @for (k of ligaData.topPorteras; track k.rank) {
+          @for (k of ligaData.topPorteras(); track k.rank) {
             <button
               type="button"
               (click)="irAPerfilJugadora(k.playerId)"

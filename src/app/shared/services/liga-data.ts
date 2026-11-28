@@ -238,12 +238,17 @@ export class LigaDataService {
 
   async sincronizarConMySQL(): Promise<void> {
     try {
-      const [equiposApi, jugadorasApi, partidosApi, rankingsApi] = await Promise.all([
+      const [equiposRes, jugadorasRes, partidosRes, rankingsRes] = await Promise.allSettled([
         firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/equipos`)),
         firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/jugadoras`)),
-        firstValueFrom(this.http.get<PartidoDominical[]>(`${this.apiUrl}/partidos`)),
+        firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/partidos`)),
         firstValueFrom(this.http.get<any>(`${this.apiUrl}/rankings`)),
       ]);
+
+      const equiposApi = equiposRes.status === 'fulfilled' ? equiposRes.value : [];
+      const jugadorasApi = jugadorasRes.status === 'fulfilled' ? jugadorasRes.value : [];
+      const partidosApi = partidosRes.status === 'fulfilled' ? partidosRes.value : [];
+      const rankingsApi = rankingsRes.status === 'fulfilled' ? rankingsRes.value : {};
 
       // Carga directa desde tabla equipos (por id)
       this.equipos.set(
@@ -284,13 +289,12 @@ export class LigaDataService {
         (rankingsApi?.asistencias || []).map((a: any, i: number) => ({ rank: i + 1, ...a })),
       );
 
-      this.conectadoMySQL.set(true);
+      this.conectadoMySQL.set(equiposRes.status === 'fulfilled');
     } catch (error) {
       console.error('Error conectando con MySQL:', error);
       this.conectadoMySQL.set(false);
     }
   }
-
   // Perfil dinámico buscado por ID real en jugadorasBD de MySQL
   obtenerPerfilPorId(id: number): PerfilJugadoraFotMob {
     return this.obtenerPerfilJugadora(id);
