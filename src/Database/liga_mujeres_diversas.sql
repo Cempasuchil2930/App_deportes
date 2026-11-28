@@ -1,105 +1,61 @@
--- phpMyAdmin SQL Dump
--- version 5.2.3
--- https://www.phpmyadmin.net/
---
--- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 27-11-2026 a las 23:05:04
--- Versión del servidor: 8.4.7
--- Versión de PHP: 8.3.28
+DROP DATABASE IF EXISTS `liga_mujeres_diversas`;
+CREATE DATABASE `liga_mujeres_diversas` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `liga_mujeres_diversas`;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET SQL_SAFE_UPDATES = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Base de datos: `liga_mujeres_diversas`
---
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `equipos`
---
-
-DROP TABLE IF EXISTS `equipos`;
-CREATE TABLE IF NOT EXISTS `equipos` (
+CREATE TABLE `equipos` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
   `nombre` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
   `abreviatura` varchar(5) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `abbr` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT 'EQ',
   `color_distintivo` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `color_tailwind` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'bg-purple-600',
+  `pj` int DEFAULT 0,
+  `pg` int DEFAULT 0,
+  `pp` int DEFAULT 0,
+  `gf` int DEFAULT 0,
+  `gc` int DEFAULT 0,
+  `pts` int DEFAULT 0,
   `estatus` enum('APROBADO','PENDIENTE','RECHAZADO') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'APROBADO',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_equipo_nombre` (`nombre`)
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Volcado de datos para la tabla `equipos`
---
+INSERT INTO `equipos` (`id`, `nombre`, `abreviatura`, `abbr`, `color_distintivo`, `color_tailwind`, `pj`, `pg`, `pp`, `gf`, `gc`, `pts`, `estatus`, `created_at`) VALUES
+(1, 'QUEER GOALS', 'QGL', 'QGL', 'Rosa / Blanco', 'bg-pink-500', 8, 6, 1, 22, 8, 19, 'APROBADO', '2026-11-27 22:59:40'),
+(2, 'VALQUIRIAS', 'VLQ', 'VLQ', 'Naranja / Negro', 'bg-orange-500', 8, 5, 1, 18, 9, 17, 'APROBADO', '2026-11-27 22:59:40'),
+(3, 'GOOD VIBES', 'GDV', 'GDV', 'Magenta / Azul', 'bg-fuchsia-600', 8, 5, 2, 16, 11, 16, 'APROBADO', '2026-11-27 22:59:40'),
+(4, 'ALL STARS GV', 'ASV', 'ASV', 'Naranja / Dorado', 'bg-amber-500', 8, 4, 2, 15, 12, 14, 'APROBADO', '2026-11-27 22:59:40'),
+(5, 'TBD UNITED', 'TBD', 'TBD', 'Amarillo / Negro', 'bg-yellow-500', 8, 4, 3, 14, 13, 13, 'APROBADO', '2026-11-27 22:59:40'),
+(6, 'UNKNOWN', 'UNK', 'UNK', 'Morado / Cian', 'bg-purple-600', 8, 3, 3, 12, 12, 11, 'APROBADO', '2026-11-27 22:59:40'),
+(7, 'F.C. LIONESSES', 'FCL', 'FCL', 'Verde Neón / Negro', 'bg-emerald-500', 8, 3, 4, 13, 14, 10, 'APROBADO', '2026-11-27 22:59:40'),
+(8, 'BANDIDAS F.C.', 'BND', 'BND', 'Verde / Blanco', 'bg-green-600', 8, 2, 4, 10, 15, 8, 'APROBADO', '2026-11-27 22:59:40'),
+(9, 'REAL MADRID', 'RMD', 'RMD', 'Morado / Blanco', 'bg-indigo-600', 8, 2, 5, 9, 16, 7, 'APROBADO', '2026-11-27 22:59:40'),
+(10, 'FÉNIX F.C.', 'FNX', 'FNX', 'Fucsia / Negro', 'bg-rose-600', 8, 1, 5, 8, 17, 5, 'APROBADO', '2026-11-27 22:59:40'),
+(11, 'LOBAS MÉXICO', 'LBS', 'LBS', 'Azul Cian / Negro', 'bg-cyan-600', 8, 1, 6, 6, 16, 4, 'APROBADO', '2026-11-27 22:59:40');
 
-INSERT INTO `equipos` (`id`, `nombre`, `abreviatura`, `color_distintivo`, `estatus`, `created_at`) VALUES
-(1, 'QUEER GOALS', 'QGL', 'Rosa / Blanco', 'APROBADO', '2026-11-27 22:59:40'),
-(2, 'VALQUIRIAS', 'VLQ', 'Naranja / Negro', 'APROBADO', '2026-11-27 22:59:40'),
-(3, 'GOOD VIBES', 'GDV', 'Magenta / Azul', 'APROBADO', '2026-11-27 22:59:40'),
-(4, 'ALL STARS GV', 'ASV', 'Naranja / Dorado', 'APROBADO', '2026-11-27 22:59:40'),
-(5, 'TBD UNITED', 'TBD', 'Amarillo / Negro', 'APROBADO', '2026-11-27 22:59:40'),
-(6, 'UNKNOWN', 'UNK', 'Morado / Cian', 'APROBADO', '2026-11-27 22:59:40'),
-(7, 'F.C. LIONESSES', 'FCL', 'Verde Neón / Negro', 'APROBADO', '2026-11-27 22:59:40'),
-(8, 'BANDIDAS F.C.', 'BND', 'Verde / Blanco', 'APROBADO', '2026-11-27 22:59:40'),
-(9, 'REAL MADRID', 'RMD', 'Morado / Blanco', 'APROBADO', '2026-11-27 22:59:40'),
-(10, 'FÉNIX F.C.', 'FNX', 'Fucsia / Negro', 'APROBADO', '2026-11-27 22:59:40'),
-(11, 'LOBAS MÉXICO', 'LBS', 'Azul Cian / Negro', 'APROBADO', '2026-11-27 22:59:40');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `estadisticas_partido`
---
-
-DROP TABLE IF EXISTS `estadisticas_partido`;
-CREATE TABLE IF NOT EXISTS `estadisticas_partido` (
-  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
-  `partido_id` int UNSIGNED NOT NULL,
-  `jugadora_id` int UNSIGNED NOT NULL,
-  `goles` tinyint UNSIGNED NOT NULL DEFAULT '0',
-  `tarjetas_amarillas` tinyint UNSIGNED NOT NULL DEFAULT '0',
-  `tarjetas_rojas` tinyint UNSIGNED NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `fk_stats_partido` (`partido_id`),
-  KEY `fk_stats_jugadora` (`jugadora_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `jugadoras`
---
-
-DROP TABLE IF EXISTS `jugadoras`;
-CREATE TABLE IF NOT EXISTS `jugadoras` (
+CREATE TABLE `jugadoras` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
   `equipo_id` int UNSIGNED NOT NULL,
   `numero_lista` tinyint UNSIGNED NOT NULL,
   `nombre_completo` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `edad` tinyint UNSIGNED NOT NULL,
   `posicion` enum('Portera','Defensa','Medio','Delantera') COLLATE utf8mb4_unicode_ci NOT NULL,
   `numero_playera` tinyint UNSIGNED NOT NULL,
+  `dorsal` tinyint UNSIGNED DEFAULT NULL,
   `pronombres` enum('Ella','Elle','Él') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Ella',
   `foto_autorizada` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_jugadoras_equipo` (`equipo_id`)
+  KEY `idx_jugadoras_equipo` (`equipo_id`),
+  CONSTRAINT `fk_jugadoras_equipo` FOREIGN KEY (`equipo_id`) REFERENCES `equipos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=166 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `jugadoras`
---
 
 INSERT INTO `jugadoras` (`id`, `equipo_id`, `numero_lista`, `nombre_completo`, `edad`, `posicion`, `numero_playera`, `pronombres`, `foto_autorizada`, `created_at`) VALUES
 (1, 1, 1, 'Mariana López Hernández', 26, 'Portera', 1, 'Ella', 1, '2026-11-27 22:59:41'),
@@ -268,14 +224,12 @@ INSERT INTO `jugadoras` (`id`, `equipo_id`, `numero_lista`, `nombre_completo`, `
 (164, 11, 14, 'Lucía Pérez Castro', 35, 'Defensa', 14, 'Ella', 1, '2026-11-27 22:59:41'),
 (165, 11, 15, 'Natalia Romero Luna', 27, 'Delantera', 15, 'Ella', 1, '2026-11-27 22:59:41');
 
--- --------------------------------------------------------
+UPDATE `jugadoras`
+SET `nombre` = `nombre_completo`,
+    `dorsal` = `numero_playera`
+WHERE `id` > 0;
 
---
--- Estructura de tabla para la tabla `partidos`
---
-
-DROP TABLE IF EXISTS `partidos`;
-CREATE TABLE IF NOT EXISTS `partidos` (
+CREATE TABLE `partidos` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
   `jornada` tinyint UNSIGNED NOT NULL,
   `equipo_local_id` int UNSIGNED NOT NULL,
@@ -283,20 +237,83 @@ CREATE TABLE IF NOT EXISTS `partidos` (
   `goles_local` tinyint UNSIGNED NOT NULL DEFAULT '0',
   `goles_visitante` tinyint UNSIGNED NOT NULL DEFAULT '0',
   `fecha_partido` datetime DEFAULT NULL,
+  `fecha_hora` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `estatus` enum('PROGRAMADO','FINALIZADO') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PROGRAMADO',
+  `estado` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT 'PROGRAMADO',
+  `penales_detalle` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `mvp_nombre` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cancha` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT 'Cancha 1',
   PRIMARY KEY (`id`),
   KEY `fk_partido_local` (`equipo_local_id`),
-  KEY `fk_partido_visitante` (`equipo_visitante_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_partido_visitante` (`equipo_visitante_id`),
+  CONSTRAINT `fk_partido_local` FOREIGN KEY (`equipo_local_id`) REFERENCES `equipos` (`id`),
+  CONSTRAINT `fk_partido_visitante` FOREIGN KEY (`equipo_visitante_id`) REFERENCES `equipos` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
+INSERT INTO `partidos` (`id`, `jornada`, `equipo_local_id`, `equipo_visitante_id`, `goles_local`, `goles_visitante`, `fecha_partido`, `fecha_hora`, `estatus`, `estado`, `penales_detalle`, `mvp_nombre`, `cancha`) VALUES
+(1,  4,  1, 11, 3, 0, '2026-10-25 09:00:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(2,  4,  2, 10, 2, 1, '2026-10-25 09:50:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(3,  4,  3,  9, 4, 2, '2026-10-25 10:40:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(4,  4,  4,  8, 1, 1, '2026-10-25 11:30:00', 'Finalizado • Penales', 'FINALIZADO', 'FINALIZADO', 'Penales 4-3', NULL, 'Cancha 1'),
+(5,  4,  5,  7, 2, 3, '2026-10-25 12:20:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(6,  5,  6,  1, 1, 3, '2026-11-01 09:00:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(7,  5,  7,  2, 2, 2, '2026-11-01 09:50:00', 'Finalizado • Penales', 'FINALIZADO', 'FINALIZADO', 'Penales 3-5', NULL, 'Cancha 1'),
+(8,  5,  8,  3, 0, 2, '2026-11-01 10:40:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(9,  5,  9,  4, 1, 3, '2026-11-01 11:30:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(10, 5, 10,  5, 1, 2, '2026-11-01 12:20:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(11, 6, 11,  6, 1, 2, '2026-11-08 09:00:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(12, 6,  1,  5, 4, 1, '2026-11-08 09:50:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(13, 6,  2,  4, 3, 2, '2026-11-08 10:40:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(14, 6,  3,  7, 2, 1, '2026-11-08 11:30:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(15, 6,  8,  9, 2, 0, '2026-11-08 12:20:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(16, 6, 10, 11, 2, 1, '2026-11-08 13:10:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(17, 7,  6,  8, 3, 1, '2026-11-15 09:00:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(18, 7,  4,  1, 1, 2, '2026-11-15 09:50:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(19, 7,  5,  2, 1, 3, '2026-11-15 10:40:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(20, 7,  9, 10, 2, 1, '2026-11-15 11:30:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(21, 7, 11,  3, 0, 3, '2026-11-15 12:20:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(22, 7,  7,  6, 2, 1, '2026-11-15 13:10:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(23, 8,  1,  3, 3, 1, '2026-11-22 09:00:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(24, 8,  2,  6, 2, 0, '2026-11-22 09:50:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(25, 8,  7,  8, 3, 1, '2026-11-22 10:40:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(26, 8,  4, 10, 4, 1, '2026-11-22 11:30:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(27, 8,  5,  9, 2, 1, '2026-11-22 12:20:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(28, 8, 11,  9, 1, 2, '2026-11-22 13:10:00', 'Finalizado • 40\'',    'FINALIZADO', 'FINALIZADO', NULL,          NULL, 'Cancha 1'),
+(29, 9,  1,  2, 0, 0, '2026-11-29 09:00:00', 'Dom 09:00 • Cancha 1', 'PROGRAMADO', 'PROGRAMADO', NULL,          NULL, 'Cancha 1'),
+(30, 9,  3,  4, 0, 0, '2026-11-29 09:50:00', 'Dom 09:50 • Cancha 1', 'PROGRAMADO', 'PROGRAMADO', NULL,          NULL, 'Cancha 1'),
+(31, 9,  5,  6, 0, 0, '2026-11-29 10:40:00', 'Dom 10:40 • Cancha 1', 'PROGRAMADO', 'PROGRAMADO', NULL,          NULL, 'Cancha 1'),
+(32, 9,  7, 11, 0, 0, '2026-11-29 11:30:00', 'Dom 11:30 • Cancha 1', 'PROGRAMADO', 'PROGRAMADO', NULL,          NULL, 'Cancha 1'),
+(33, 9,  8, 10, 0, 0, '2026-11-29 12:20:00', 'Dom 12:20 • Cancha 1', 'PROGRAMADO', 'PROGRAMADO', NULL,          NULL, 'Cancha 1'),
+(34, 9,  9,  1, 0, 0, '2026-11-29 13:10:00', 'Dom 13:10 • Cancha 1', 'PROGRAMADO', 'PROGRAMADO', NULL,          NULL, 'Cancha 1');
 
---
--- Estructura de tabla para la tabla `usuarios`
---
+CREATE TABLE `estadisticas_partido` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `partido_id` int UNSIGNED NOT NULL,
+  `jugadora_id` int UNSIGNED NOT NULL,
+  `goles` tinyint UNSIGNED NOT NULL DEFAULT '0',
+  `asistencias` tinyint UNSIGNED NOT NULL DEFAULT '0',
+  `atajadas` tinyint UNSIGNED NOT NULL DEFAULT '0',
+  `tarjetas_amarillas` tinyint UNSIGNED NOT NULL DEFAULT '0',
+  `tarjetas_rojas` tinyint UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `fk_stats_partido` (`partido_id`),
+  KEY `fk_stats_jugadora` (`jugadora_id`),
+  CONSTRAINT `fk_stats_jugadora` FOREIGN KEY (`jugadora_id`) REFERENCES `jugadoras` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_stats_partido` FOREIGN KEY (`partido_id`) REFERENCES `partidos` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `usuarios`;
-CREATE TABLE IF NOT EXISTS `usuarios` (
+INSERT INTO `estadisticas_partido` (`id`, `partido_id`, `jugadora_id`, `goles`, `asistencias`, `atajadas`, `tarjetas_amarillas`, `tarjetas_rojas`) VALUES
+(1, 23,  10, 2, 1, 0, 0, 0),
+(2, 23,  11, 1, 1, 0, 0, 0),
+(3, 23,   1, 0, 0, 8, 0, 0),
+(4, 24,  25, 2, 0, 0, 0, 0),
+(5, 24,  16, 0, 0, 7, 0, 0),
+(6, 25, 100, 2, 1, 0, 0, 0),
+(7, 25,  91, 0, 0, 6, 0, 0),
+(8, 26,  55, 3, 1, 0, 0, 0),
+(9, 27,  70, 2, 0, 0, 0, 0);
+
+CREATE TABLE `usuarios` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
   `equipo_id` int UNSIGNED DEFAULT NULL,
   `nombre` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -307,47 +324,11 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_usuario_correo` (`correo`),
-  KEY `fk_usuarios_equipo` (`equipo_id`)
+  KEY `fk_usuarios_equipo` (`equipo_id`),
+  CONSTRAINT `fk_usuarios_equipo` FOREIGN KEY (`equipo_id`) REFERENCES `equipos` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `usuarios`
---
 
 INSERT INTO `usuarios` (`id`, `equipo_id`, `nombre`, `correo`, `password_hash`, `rol`, `activo`, `created_at`) VALUES
 (1, NULL, 'Coach Nayeli', 'nayeli.coach@mujeresdiversas.mx', '12345678', 'ADMIN', 1, '2026-11-27 22:59:41');
 
---
--- Restricciones para tablas volcadas
---
-
---
--- Filtros para la tabla `estadisticas_partido`
---
-ALTER TABLE `estadisticas_partido`
-  ADD CONSTRAINT `fk_stats_jugadora` FOREIGN KEY (`jugadora_id`) REFERENCES `jugadoras` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_stats_partido` FOREIGN KEY (`partido_id`) REFERENCES `partidos` (`id`) ON DELETE CASCADE;
-
---
--- Filtros para la tabla `jugadoras`
---
-ALTER TABLE `jugadoras`
-  ADD CONSTRAINT `fk_jugadoras_equipo` FOREIGN KEY (`equipo_id`) REFERENCES `equipos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `partidos`
---
-ALTER TABLE `partidos`
-  ADD CONSTRAINT `fk_partido_local` FOREIGN KEY (`equipo_local_id`) REFERENCES `equipos` (`id`),
-  ADD CONSTRAINT `fk_partido_visitante` FOREIGN KEY (`equipo_visitante_id`) REFERENCES `equipos` (`id`);
-
---
--- Filtros para la tabla `usuarios`
---
-ALTER TABLE `usuarios`
-  ADD CONSTRAINT `fk_usuarios_equipo` FOREIGN KEY (`equipo_id`) REFERENCES `equipos` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

@@ -83,12 +83,8 @@ export class Entrenamientos {
     return cat === 'Todos' ? this.services : this.services.filter((s) => s.discipline === cat);
   });
 
-  contactCoach(coachName?: string): void {
-    const message = coachName
-      ? `Poniéndote en contacto con tu entrenador@ (${coachName})...`
-      : 'Poniéndote en contacto con tu entrenador@...';
-
-    this.coachNotification.set(message);
+  contactCoach(_coachName?: string): void {
+    this.coachNotification.set('Poniéndote en contacto');
 
     if (this.notificationTimer) {
       clearTimeout(this.notificationTimer);

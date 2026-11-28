@@ -44,7 +44,6 @@ interface SavedMatchSheet {
       class="min-h-screen bg-transparent text-[#111111] dark:text-slate-100 p-4 sm:p-8 transition-colors duration-300"
     >
       <div class="max-w-[1220px] mx-auto space-y-6">
-        <!-- CABECERA Y SELECTOR DE PESTAÑAS -->
         <div class="flex flex-wrap items-center justify-between gap-4 px-1">
           <h1
             class="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#111111] dark:text-white"
@@ -81,7 +80,6 @@ interface SavedMatchSheet {
           </div>
         </div>
 
-        <!-- MENSAJE DE RETROALIMENTACIÓN -->
         <div
           *ngIf="feedbackMessage()"
           class="rounded-2xl px-4 py-3 bg-[#ECFDF5] border border-[#A7F3D0] text-xs font-bold text-[#059669] flex items-center justify-between"
@@ -92,7 +90,6 @@ interface SavedMatchSheet {
           </button>
         </div>
 
-        <!-- PESTAÑA 1: PANEL ADMINISTRATIVO -->
         <div *ngIf="activeTab() === 'PANEL'" class="space-y-6">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="admin-white-card rounded-3xl p-6 space-y-1.5">
@@ -188,22 +185,19 @@ interface SavedMatchSheet {
           </div>
         </div>
 
-        <!-- PESTAÑA 2: CÉDULA ARBITRAL COMPLETA -->
         <div *ngIf="activeTab() === 'CEDULA'" class="space-y-6">
           <div
             *ngIf="editingSheetId()"
             class="rounded-2xl px-4 py-3 bg-[#E5EFFC] border border-[#7FA3D4]/70 text-xs font-bold text-[#2B548C] flex items-center justify-between"
           >
             <span>
-              ✎ Editando cédula guardada ({{ selectedMatchday }} · {{ homeTeam }} vs
-              {{ awayTeam }})
+              ✎ Editando cédula guardada ({{ selectedMatchday }} · {{ homeTeam }} vs {{ awayTeam }})
             </span>
             <button type="button" (click)="cancelEditSheet()" class="underline cursor-pointer">
               Cancelar edición
             </button>
           </div>
 
-          <!-- DATOS GENERALES DEL ENCUENTRO Y MARCADOR + PENALES -->
           <div class="admin-white-card rounded-3xl p-6 sm:p-7 space-y-6">
             <div
               class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pb-4 border-b border-slate-200/80 dark:border-[#232730]"
@@ -274,7 +268,6 @@ interface SavedMatchSheet {
               </div>
             </div>
 
-            <!-- MARCADOR REGLAMENTARIO (40 MIN) -->
             <div class="flex flex-col items-center gap-4 py-2">
               <span
                 class="px-3 py-1 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-[#1A1E26] text-slate-500"
@@ -322,7 +315,9 @@ interface SavedMatchSheet {
 
                 <div class="flex items-center justify-center gap-4">
                   <div class="text-center">
-                    <label class="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                    <label
+                      class="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1"
+                    >
                       Penales {{ homeTeam }}
                     </label>
                     <input
@@ -336,7 +331,9 @@ interface SavedMatchSheet {
                   <span class="text-xs font-extrabold text-slate-400 mt-4">-</span>
 
                   <div class="text-center">
-                    <label class="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                    <label
+                      class="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1"
+                    >
                       Penales {{ awayTeam }}
                     </label>
                     <input
@@ -351,9 +348,7 @@ interface SavedMatchSheet {
             </div>
           </div>
 
-          <!-- TABLAS INDIVIDUALES POR EQUIPO (MINUTOS, GOLES, ASISTENCIAS, ATAJADAS, TA, TR) -->
           <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <!-- EQUIPO LOCAL -->
             <div class="admin-white-card rounded-3xl p-5 sm:p-6 space-y-4">
               <div
                 class="flex items-center justify-between pb-2.5 border-b border-slate-200/80 dark:border-[#232730]"
@@ -386,7 +381,9 @@ interface SavedMatchSheet {
                     <tr *ngFor="let p of homePlayers()">
                       <td class="py-2 pr-1 font-bold text-slate-500">{{ p.dorsal }}</td>
                       <td class="py-2 pr-2">
-                        <div class="font-bold text-slate-900 dark:text-white truncate max-w-[130px]">
+                        <div
+                          class="font-bold text-slate-900 dark:text-white truncate max-w-[130px]"
+                        >
                           {{ p.name }}
                         </div>
                         <div class="text-[10px] text-slate-400">{{ p.position }}</div>
@@ -482,7 +479,9 @@ interface SavedMatchSheet {
                     <tr *ngFor="let p of awayPlayers()">
                       <td class="py-2 pr-1 font-bold text-slate-500">{{ p.dorsal }}</td>
                       <td class="py-2 pr-2">
-                        <div class="font-bold text-slate-900 dark:text-white truncate max-w-[130px]">
+                        <div
+                          class="font-bold text-slate-900 dark:text-white truncate max-w-[130px]"
+                        >
                           {{ p.name }}
                         </div>
                         <div class="text-[10px] text-slate-400">{{ p.position }}</div>
@@ -546,7 +545,6 @@ interface SavedMatchSheet {
             </div>
           </div>
 
-          <!-- BOTONES DE GUARDADO -->
           <div class="flex justify-end gap-3">
             <button
               *ngIf="editingSheetId()"
@@ -566,7 +564,6 @@ interface SavedMatchSheet {
             </button>
           </div>
 
-          <!-- HISTORIAL DE CÉDULAS GUARDADAS -->
           <div
             *ngIf="savedSheets().length > 0"
             class="admin-white-card rounded-3xl p-6 sm:p-7 space-y-4"
@@ -668,7 +665,7 @@ export class AdminPanelPageComponent {
 
   onTeamChange(side: 'HOME' | 'AWAY', teamName: string): void {
     const equipo = this.ligaData.equipos().find((e) => e.name === teamName);
-    const roster = equipo ? this.ligaData.rostersPorEquipo[equipo.id] ?? [] : [];
+    const roster = equipo ? (this.ligaData.rostersPorEquipo()[equipo.id] ?? []) : [];
 
     const rows: PlayerEventRow[] = [...roster]
       .sort((a, b) => a.dorsal - b.dorsal)
