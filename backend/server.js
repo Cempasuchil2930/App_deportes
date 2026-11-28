@@ -9,13 +9,12 @@ app.use(express.json());
 const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
-  password: '277353', // Cambia si tu XAMPP/MySQL tiene contraseña
+  password: '277353',
   database: 'liga_mujeres_diversas',
   waitForConnections: true,
   connectionLimit: 10,
 });
 
-// 1. Obtener equipos
 app.get('/api/equipos', async (req, res) => {
   try {
     const [rows] = await pool.query(
@@ -27,7 +26,6 @@ app.get('/api/equipos', async (req, res) => {
   }
 });
 
-// 2. Obtener jugadoras
 app.get('/api/jugadoras', async (req, res) => {
   try {
     const [rows] = await pool.query(`
@@ -42,7 +40,6 @@ app.get('/api/jugadoras', async (req, res) => {
   }
 });
 
-// 3. Obtener partidos desde MySQL
 app.get('/api/partidos', async (req, res) => {
   try {
     const [rows] = await pool.query(`
@@ -81,7 +78,6 @@ app.get('/api/partidos', async (req, res) => {
   }
 });
 
-// 4. Registrar nuevo partido en MySQL y recalcular tabla
 app.post('/api/partidos', async (req, res) => {
   const { round, time, home, away, status, score, penalties, mvp } = req.body;
   const conn = await pool.getConnection();
@@ -123,11 +119,9 @@ app.post('/api/partidos', async (req, res) => {
       ],
     );
 
-    // Si el partido ya finalizó, actualiza puntos y goles en la tabla equipos
     if ((status || 'FINALIZADO') === 'FINALIZADO') {
       const ganoLocal = golesLocal > golesVisitante;
       const ganoVisitante = golesVisitante > golesLocal;
-      // En fútbol 7 LMD: victoria = 3 pts, empate ganado en penales = 2 pts / perdido = 1 pt (o 1 pt c/u si no hay penales)
       let ptsLocal = 1;
       let ptsVisitante = 1;
       if (ganoLocal) {
@@ -182,7 +176,6 @@ app.post('/api/partidos', async (req, res) => {
   }
 });
 
-// 5. Rankings desde estadisticas_partido
 app.get('/api/rankings', async (req, res) => {
   try {
     const [goleadoras] = await pool.query(`
@@ -225,7 +218,6 @@ app.get('/api/rankings', async (req, res) => {
   }
 });
 
-// 6. Login contra la tabla usuarios
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
   try {

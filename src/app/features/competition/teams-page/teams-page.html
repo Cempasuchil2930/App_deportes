@@ -102,12 +102,9 @@
           class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs"
         >
           <div class="flex items-center justify-between mb-3.5">
-            <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-              <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
-                Partido Siguiente
-              </h2>
-            </div>
+            <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+              Partido Siguiente
+            </h2>
             <span class="text-[11px] font-semibold text-slate-400">
               {{ equipo.proximoPartido?.jornada || 'Jornada 09' }} • 40 min sin empates
             </span>
@@ -157,12 +154,9 @@
           class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs"
         >
           <div class="flex items-center justify-between mb-3.5">
-            <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
-                Últimos Partidos
-              </h2>
-            </div>
+            <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+              Últimos Partidos
+            </h2>
             <span class="text-[11px] text-slate-400">Últimos 5 encuentros</span>
           </div>
 
@@ -372,9 +366,7 @@
       class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs space-y-4"
     >
       <div class="flex items-center justify-between">
-        <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">
-          Equipo ({{ rosterOrdenado().length }} Integrantes)
-        </h2>
+        <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Equipo</h2>
         <span class="text-[11px] text-slate-400"> Selecciona una jugadora para ver su ficha </span>
       </div>
 
