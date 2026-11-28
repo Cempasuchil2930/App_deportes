@@ -1,4 +1,6 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 
 export interface EquipoTabla {
   id: number;
@@ -138,6 +140,71 @@ export interface SesionEntrenamiento {
   providedIn: 'root',
 })
 export class LigaDataService {
+  private http = inject(HttpClient);
+  private readonly apiUrl = 'http://localhost:3000/api';
+
+  readonly jugadorasBD = signal<any[]>([]);
+  readonly conectadoMySQL = signal(false);
+
+  constructor() {
+    queueMicrotask(() => {
+      this.sincronizarConMySQL();
+    });
+  }
+
+  async sincronizarConMySQL(): Promise<void> {
+    try {
+      const [equiposApi, jugadorasApi] = await Promise.all([
+        firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/equipos`)),
+        firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/jugadoras`)),
+      ]);
+
+      if (equiposApi?.length) {
+        const actuales = this.equipos();
+        const actualizados: EquipoTabla[] = equiposApi.map((eqApi) => {
+          const baseLocal = actuales.find((m) => m.name.toLowerCase() === eqApi.name.toLowerCase());
+          const tienePartidosEnBD = eqApi.pj > 0;
+
+          return {
+            ...(baseLocal ?? {
+              pj: 0,
+              pg: 0,
+              pp: 0,
+              gf: 0,
+              gc: 0,
+              pts: 0,
+            }),
+            id: eqApi.id,
+            abbr: eqApi.abbr,
+            name: eqApi.name,
+            color: eqApi.color,
+            ...(tienePartidosEnBD
+              ? {
+                  pj: eqApi.pj,
+                  pg: eqApi.pg,
+                  pp: eqApi.pp,
+                  gf: eqApi.gf,
+                  gc: eqApi.gc,
+                  pts: eqApi.pts,
+                }
+              : {}),
+          };
+        });
+
+        this.equipos.set(actualizados);
+      }
+
+      if (jugadorasApi?.length) {
+        this.jugadorasBD.set(jugadorasApi);
+      }
+
+      this.conectadoMySQL.set(true);
+    } catch (error) {
+      console.warn('Backend apagado, usando datos locales:', error);
+      this.conectadoMySQL.set(false);
+    }
+  }
+
   readonly equipos = signal<EquipoTabla[]>([
     {
       id: 1,
@@ -158,7 +225,13 @@ export class LigaDataService {
         local: true,
       },
       ultimosPartidos: [
-        { jornada: 'J08', rival: 'Valquirias', score: '1 (4) - (3) 1', gano: true, nota: 'Ganado en penales' },
+        {
+          jornada: 'J08',
+          rival: 'Valquirias',
+          score: '1 (4) - (3) 1',
+          gano: true,
+          nota: 'Ganado en penales',
+        },
         { jornada: 'J07', rival: 'F.C. Lionesses', score: '2 - 1', gano: true },
         { jornada: 'J06', rival: 'Good Vibes', score: '3 - 1', gano: true },
         { jornada: 'J05', rival: 'Lobas México', score: '4 - 1', gano: true },
@@ -192,7 +265,13 @@ export class LigaDataService {
         local: false,
       },
       ultimosPartidos: [
-        { jornada: 'J08', rival: 'Queer Goals', score: '1 (3) - (4) 1', gano: false, nota: 'Derrota en penales' },
+        {
+          jornada: 'J08',
+          rival: 'Queer Goals',
+          score: '1 (3) - (4) 1',
+          gano: false,
+          nota: 'Derrota en penales',
+        },
         { jornada: 'J07', rival: 'Bandidas F.C.', score: '4 - 1', gano: true },
         { jornada: 'J06', rival: 'Fénix F.C.', score: '3 - 0', gano: true },
         { jornada: 'J05', rival: 'Real Madrid', score: '2 - 1', gano: true },
@@ -226,7 +305,13 @@ export class LigaDataService {
         { jornada: 'J08', rival: 'Lobas México', score: '2 - 0', gano: true },
         { jornada: 'J07', rival: 'Queer Goals', score: '1 - 2', gano: false },
         { jornada: 'J06', rival: 'Good Vibes', score: '3 - 1', gano: true },
-        { jornada: 'J05', rival: 'TBD United', score: '2 (5) - (4) 2', gano: true, nota: 'Ganado en penales' },
+        {
+          jornada: 'J05',
+          rival: 'TBD United',
+          score: '2 (5) - (4) 2',
+          gano: true,
+          nota: 'Ganado en penales',
+        },
         { jornada: 'J04', rival: 'Bandidas F.C.', score: '4 - 2', gano: true },
       ],
       trofeos: [{ torneo: 'Torneo Apertura', anio: '2024', cantidad: 1 }],
@@ -263,7 +348,12 @@ export class LigaDataService {
       trofeos: [{ torneo: 'Torneo Clausura', anio: '2023', cantidad: 1 }],
       mejoresJugadoras: {
         goleadora: { playerId: 409, nombre: 'Valentina Romero Díaz', dorsal: 9, goles: 7 },
-        asistencias: { playerId: 410, nombre: 'Gabriela Mendoza Silva', dorsal: 10, asistencias: 4 },
+        asistencias: {
+          playerId: 410,
+          nombre: 'Gabriela Mendoza Silva',
+          dorsal: 10,
+          asistencias: 4,
+        },
       },
     },
     {
@@ -289,7 +379,13 @@ export class LigaDataService {
         { jornada: 'J07', rival: 'TBD United', score: '3 - 1', gano: true },
         { jornada: 'J06', rival: 'Bandidas F.C.', score: '2 - 1', gano: true },
         { jornada: 'J05', rival: 'Queer Goals', score: '1 - 4', gano: false },
-        { jornada: 'J04', rival: 'Fénix F.C.', score: '2 (3) - (2) 2', gano: true, nota: 'Ganado en penales' },
+        {
+          jornada: 'J04',
+          rival: 'Fénix F.C.',
+          score: '2 (3) - (2) 2',
+          gano: true,
+          nota: 'Ganado en penales',
+        },
       ],
       trofeos: [],
       mejoresJugadoras: {
@@ -351,12 +447,23 @@ export class LigaDataService {
         { jornada: 'J07', rival: 'All Stars GV', score: '2 - 1', gano: true },
         { jornada: 'J06', rival: 'Valquirias', score: '0 - 3', gano: false },
         { jornada: 'J05', rival: 'Real Madrid', score: '2 - 1', gano: true },
-        { jornada: 'J04', rival: 'Lobas México', score: '2 (2) - (3) 2', gano: false, nota: 'Derrota en penales' },
+        {
+          jornada: 'J04',
+          rival: 'Lobas México',
+          score: '2 (2) - (3) 2',
+          gano: false,
+          nota: 'Derrota en penales',
+        },
       ],
       trofeos: [],
       mejoresJugadoras: {
         goleadora: { playerId: 709, nombre: 'Paola Díaz Romero', dorsal: 9, goles: 5 },
-        asistencias: { playerId: 710, nombre: 'Melissa Castro Jiménez', dorsal: 10, asistencias: 3 },
+        asistencias: {
+          playerId: 710,
+          nombre: 'Melissa Castro Jiménez',
+          dorsal: 10,
+          asistencias: 3,
+        },
       },
     },
     {
@@ -412,7 +519,13 @@ export class LigaDataService {
         { jornada: 'J08', rival: 'Bandidas F.C.', score: '1 - 2', gano: false },
         { jornada: 'J07', rival: 'Lobas México', score: '1 - 3', gano: false },
         { jornada: 'J06', rival: 'Unknown', score: '2 - 0', gano: true },
-        { jornada: 'J05', rival: 'F.C. Lionesses', score: '2 (4) - (5) 2', gano: false, nota: 'Derrota en penales' },
+        {
+          jornada: 'J05',
+          rival: 'F.C. Lionesses',
+          score: '2 (4) - (5) 2',
+          gano: false,
+          nota: 'Derrota en penales',
+        },
         { jornada: 'J04', rival: 'Real Madrid', score: '2 - 1', gano: true },
       ],
       trofeos: [],
@@ -449,7 +562,12 @@ export class LigaDataService {
       trofeos: [],
       mejoresJugadoras: {
         goleadora: { playerId: 1009, nombre: 'Karla Castillo Morales', dorsal: 9, goles: 4 },
-        asistencias: { playerId: 1010, nombre: 'Mariana Ortiz Hernández', dorsal: 10, asistencias: 2 },
+        asistencias: {
+          playerId: 1010,
+          nombre: 'Mariana Ortiz Hernández',
+          dorsal: 10,
+          asistencias: 2,
+        },
       },
     },
     {
@@ -471,7 +589,13 @@ export class LigaDataService {
         local: true,
       },
       ultimosPartidos: [
-        { jornada: 'J08', rival: 'Descanso Oficial', score: '2 - 0', gano: true, nota: 'Partido amistoso' },
+        {
+          jornada: 'J08',
+          rival: 'Descanso Oficial',
+          score: '2 - 0',
+          gano: true,
+          nota: 'Partido amistoso',
+        },
         { jornada: 'J07', rival: 'Unknown', score: '1 - 2', gano: false },
         { jornada: 'J06', rival: 'All Stars GV', score: '2 - 3', gano: false },
         { jornada: 'J05', rival: 'Fénix F.C.', score: '1 - 2', gano: false },
@@ -480,7 +604,12 @@ export class LigaDataService {
       trofeos: [],
       mejoresJugadoras: {
         goleadora: { playerId: 1109, nombre: 'Ximena Mendoza León', dorsal: 9, goles: 3 },
-        asistencias: { playerId: 1110, nombre: 'Karla Jiménez Morales', dorsal: 10, asistencias: 2 },
+        asistencias: {
+          playerId: 1110,
+          nombre: 'Karla Jiménez Morales',
+          dorsal: 10,
+          asistencias: 2,
+        },
       },
     },
   ]);
@@ -491,7 +620,9 @@ export class LigaDataService {
 
   readonly top5Equipos = computed(() => this.tablaOrdenada().slice(0, 5));
 
-  // Padrón Oficial de 15 jugadoras por equipo (PDF 4.ª Edición)
+  readonly proximosPartidos = computed(() =>
+    this.partidos().filter((p) => p.status === 'PROGRAMADO'),
+  );
   readonly rostersPorEquipo: Record<number, JugadoraRosterPublica[]> = {
     1: [
       { playerId: 101, nick: 'Mariana López Hernández', dorsal: 1, position: 'Portera' },
@@ -742,59 +873,159 @@ export class LigaDataService {
   readonly topPorteras = [
     { rank: 1, playerId: 301, name: 'Jessica Aguilar', team: 'F.C. Lionesses', stat: '36 / 8' },
     { rank: 2, playerId: 101, name: 'Mariana López', team: 'Queer Goals', stat: '31 / 7' },
-    { rank: 4, playerId: 201, name: 'Laura Martínez', team: 'Valquirias', stat: '25 / 9' },
+    { rank: 3, playerId: 201, name: 'Laura Martínez', team: 'Valquirias', stat: '28 / 10' },
   ];
 
-  readonly perfilesJugadoras: PerfilJugadoraFotMob[] = [
+  readonly topAsistencias = [
+    { rank: 1, playerId: 110, name: 'Gabriela Ortiz', team: 'Queer Goals', assists: 6 },
+    { rank: 2, playerId: 210, name: 'Lucía Ramírez', team: 'Valquirias', assists: 5 },
+    { rank: 3, playerId: 310, name: 'Natalia Herrera', team: 'F.C. Lionesses', assists: 5 },
+  ];
+
+  readonly partidos = signal<PartidoDominical[]>([
     {
-      id: 301,
-      shortLabel: 'Jessica #1 (F.C. Lionesses)',
-      fullName: 'Jessica Aguilar Torres',
-      initials: 'JA',
-      dorsal: 1,
-      team: 'F.C. Lionesses',
-      position: 'Portera',
-      pronouns: 'Ella / She',
-      imageConsent: true,
-      accentColor: '#3B82F6',
-      physical: { height: '1.75 m', age: '29 años', birth: '19 Nov 1997', foot: 'Izquierdo' },
-      season4: { matchesMinutes: "8 / 320'", goals: 0, saves: 36, cards: '0 TA • 0 TR' },
-      radar: { Ataque: 42, Fisico: 86, Velocidad: 78, Pase: 81, Regate: 64, Defensa: 94 },
-      recentMatches: [
-        { jornada: 'J08', rival: 'vs Lobas México', score: '2 - 0 (G)', mins: "40'", highlight: '5 atajadas • Portería invicta', mvp: true },
-        { jornada: 'J07', rival: 'vs Queer Goals', score: '1 - 2 (P)', mins: "40'", highlight: '6 atajadas clave', mvp: false },
-        { jornada: 'J06', rival: 'vs Good Vibes', score: '3 - 1 (G)', mins: "40'", highlight: '4 atajadas en 2.º tiempo', mvp: false },
-      ],
-      career: [
-        { edition: '4.ª Edición (Actual)', team: 'F.C. Lionesses', pj: 8, stat: '36 Atajadas • 8 GC (1.00 prom)', badge: 'Líder Portería' },
-        { edition: '3.ª Edición', team: 'F.C. Lionesses', pj: 11, stat: '48 Atajadas • Subcampeona', badge: 'Guante de Oro' },
+      id: 1,
+      round: 'Jornada 09',
+      time: 'Dom 09:00',
+      home: 'Queer Goals',
+      away: 'Valquirias',
+      status: 'PROGRAMADO',
+    },
+    {
+      id: 2,
+      round: 'Jornada 09',
+      time: 'Dom 09:50',
+      home: 'F.C. Lionesses',
+      away: 'Lobas México',
+      status: 'PROGRAMADO',
+    },
+    {
+      id: 3,
+      round: 'Jornada 09',
+      time: 'Dom 10:40',
+      home: 'Good Vibes',
+      away: 'All Stars GV',
+      status: 'PROGRAMADO',
+    },
+    {
+      id: 4,
+      round: 'Jornada 09',
+      time: 'Dom 11:30',
+      home: 'Fénix F.C.',
+      away: 'Bandidas F.C.',
+      status: 'PROGRAMADO',
+    },
+    {
+      id: 5,
+      round: 'Jornada 09',
+      time: 'Dom 12:20',
+      home: 'TBD United',
+      away: 'Unknown',
+      status: 'PROGRAMADO',
+    },
+    {
+      id: 6,
+      round: 'Jornada 08',
+      time: 'Dom 09:00',
+      home: 'Queer Goals',
+      away: 'Valquirias',
+      status: 'FINALIZADO',
+      score: '1 - 1',
+      penalties: '4 - 3 Penales',
+      mvp: 'Gabriela Ortiz Vega (#10)',
+      timeline: [
+        { min: "12'", text: 'Gol de Sofía Navarro (Queer Goals)' },
+        { min: "34'", text: 'Gol de Evelyn Reyes (Valquirias)' },
+        { min: "40'", text: 'Tanda de penales: 4 - 3 favor Queer Goals' },
       ],
     },
     {
-      id: 109,
-      shortLabel: 'Sofía #9 (Queer Goals)',
-      fullName: 'Sofía Navarro Díaz',
-      initials: 'SN',
-      dorsal: 9,
+      id: 7,
+      round: 'Jornada 08',
+      time: 'Dom 09:50',
+      home: 'F.C. Lionesses',
+      away: 'Lobas México',
+      status: 'FINALIZADO',
+      score: '2 - 0',
+      mvp: 'Jessica Aguilar Torres (#1)',
+      timeline: [
+        { min: "18'", text: 'Gol de Paola Reyes (F.C. Lionesses)' },
+        { min: "37'", text: 'Gol de Regina Jiménez (F.C. Lionesses)' },
+      ],
+    },
+    {
+      id: 8,
+      round: 'Jornada 08',
+      time: 'Dom 10:40',
+      home: 'Good Vibes',
+      away: 'Fénix F.C.',
+      status: 'FINALIZADO',
+      score: '3 - 1',
+      mvp: 'Valentina Romero Díaz (#9)',
+    },
+  ]);
+
+  readonly perfilesFotMob: PerfilJugadoraFotMob[] = [
+    {
+      id: 110,
+      shortLabel: 'G. Ortiz (#10)',
+      fullName: 'Gabriela Ortiz Vega',
+      initials: 'GO',
+      dorsal: 10,
       team: 'Queer Goals',
-      position: 'Delantera',
+      position: 'Mediocampista',
       pronouns: 'Ella / She',
       imageConsent: true,
-      accentColor: '#10B981',
-      physical: { height: '1.68 m', age: '21 años', birth: '04 Mar 2005', foot: 'Derecho' },
-      season4: { matchesMinutes: "8 / 310'", goals: 9, saves: 0, cards: '1 TA • 0 TR' },
-      radar: { Ataque: 91, Fisico: 82, Velocidad: 89, Pase: 85, Regate: 93, Defensa: 64 },
+      accentColor: '#9333ea',
+      physical: { height: '1.68 m', age: '30 años', birth: '14 Mar 1996', foot: 'Derecho' },
+      season4: { matchesMinutes: "8 / 310'", goals: 6, saves: 0, cards: '1 / 0' },
+      radar: { Ataque: 86, Fisico: 78, Velocidad: 84, Pase: 94, Regate: 91, Defensa: 72 },
       recentMatches: [
-        { jornada: 'J08', rival: 'vs Valquirias', score: '1 (4) - (3) 1 (G)', mins: "40'", highlight: "1 gol (18') + penal decisivo", mvp: true },
-        { jornada: 'J07', rival: 'vs F.C. Lionesses', score: '2 - 1 (G)', mins: "40'", highlight: '1 gol + MVP Jornada', mvp: true },
+        {
+          jornada: 'J08',
+          rival: 'Valquirias',
+          score: '1 (4) - (3) 1',
+          mins: "40'",
+          highlight: '1 Asist • Penal clave',
+          mvp: true,
+        },
+        {
+          jornada: 'J07',
+          rival: 'F.C. Lionesses',
+          score: '2 - 1',
+          mins: "40'",
+          highlight: '1 Gol • 1 Asist',
+          mvp: true,
+        },
+        {
+          jornada: 'J06',
+          rival: 'Good Vibes',
+          score: '3 - 1',
+          mins: "38'",
+          highlight: '2 Asistencias',
+          mvp: false,
+        },
       ],
       career: [
-        { edition: '4.ª Edición (Actual)', team: 'Queer Goals', pj: 8, stat: '9 Goles • 3 Asistencias', badge: 'Goleadora del Club' },
+        {
+          edition: '4.ª Edición (2026)',
+          team: 'Queer Goals',
+          pj: 8,
+          stat: '6 Goles • 6 Asist',
+          badge: 'Líder',
+        },
+        {
+          edition: '3.ª Edición (2025)',
+          team: 'Queer Goals',
+          pj: 10,
+          stat: '7 Goles • 8 Asist',
+          badge: 'Campeona',
+        },
       ],
     },
     {
       id: 209,
-      shortLabel: 'Evelyn #9 (Valquirias)',
+      shortLabel: 'E. Reyes (#9)',
       fullName: 'Evelyn Reyes Navarro',
       initials: 'ER',
       dorsal: 9,
@@ -802,203 +1033,176 @@ export class LigaDataService {
       position: 'Delantera',
       pronouns: 'Elle / They',
       imageConsent: true,
-      accentColor: '#F43F5E',
-      physical: { height: '1.71 m', age: '29 años', birth: '12 Ago 1997', foot: 'Ambidiestro' },
-      season4: { matchesMinutes: "8 / 320'", goals: 12, saves: 0, cards: '0 TA • 0 TR' },
-      radar: { Ataque: 96, Fisico: 85, Velocidad: 92, Pase: 79, Regate: 88, Defensa: 52 },
+      accentColor: '#e11d48',
+      physical: { height: '1.71 m', age: '29 años', birth: '02 Ago 1997', foot: 'Ambos' },
+      season4: { matchesMinutes: "8 / 320'", goals: 12, saves: 0, cards: '0 / 0' },
+      radar: { Ataque: 96, Fisico: 85, Velocidad: 92, Pase: 80, Regate: 89, Defensa: 55 },
       recentMatches: [
-        { jornada: 'J08', rival: 'vs Queer Goals', score: '1 (3) - (4) 1 (P)', mins: "40'", highlight: "1 gol al minuto 31'", mvp: false },
-        { jornada: 'J07', rival: 'vs Bandidas F.C.', score: '4 - 1 (G)', mins: "40'", highlight: "Hat-trick (7', 22', 38')", mvp: true },
+        {
+          jornada: 'J08',
+          rival: 'Queer Goals',
+          score: '1 (3) - (4) 1',
+          mins: "40'",
+          highlight: '1 Gol',
+          mvp: false,
+        },
+        {
+          jornada: 'J07',
+          rival: 'Bandidas F.C.',
+          score: '4 - 1',
+          mins: "40'",
+          highlight: 'Hat-trick (3 Goles)',
+          mvp: true,
+        },
       ],
       career: [
-        { edition: '4.ª Edición (Actual)', team: 'Valquirias', pj: 8, stat: '12 Goles • 2 Asistencias', badge: 'Líder Goleo' },
+        {
+          edition: '4.ª Edición (2026)',
+          team: 'Valquirias',
+          pj: 8,
+          stat: '12 Goles • 2 Asist',
+          badge: 'Goleadora',
+        },
+        {
+          edition: '3.ª Edición (2025)',
+          team: 'Valquirias',
+          pj: 10,
+          stat: '11 Goles • 4 Asist',
+          badge: 'Campeona',
+        },
       ],
     },
     {
-      id: 604,
-      shortLabel: 'Ingrid #4 (Avatar Privacidad)',
-      fullName: 'Ingrid Santana Moya',
-      initials: 'IS',
-      dorsal: 4,
-      team: 'All Stars GV',
-      position: 'Defensa',
-      pronouns: 'Elle / They',
-      imageConsent: false,
-      accentColor: '#8B5CF6',
-      physical: { height: '1.73 m', age: '27 años', birth: '09 Sep 1999', foot: 'Derecho' },
-      season4: { matchesMinutes: "8 / 295'", goals: 3, saves: 0, cards: '2 TA • 0 TR' },
-      radar: { Ataque: 68, Fisico: 91, Velocidad: 86, Pase: 80, Regate: 72, Defensa: 95 },
+      id: 301,
+      shortLabel: 'J. Aguilar (#1)',
+      fullName: 'Jessica Aguilar Torres',
+      initials: 'JA',
+      dorsal: 1,
+      team: 'F.C. Lionesses',
+      position: 'Portera',
+      pronouns: 'Ella / She',
+      imageConsent: true,
+      accentColor: '#2563eb',
+      physical: { height: '1.75 m', age: '29 años', birth: '19 Nov 1996', foot: 'Derecho' },
+      season4: { matchesMinutes: "8 / 320'", goals: 0, saves: 36, cards: '0 / 0' },
+      radar: { Ataque: 35, Fisico: 88, Velocidad: 79, Pase: 82, Regate: 60, Defensa: 95 },
       recentMatches: [
-        { jornada: 'J08', rival: 'vs Unknown', score: '2 - 1 (G)', mins: "40'", highlight: '11 recuperaciones de balón', mvp: false },
+        {
+          jornada: 'J08',
+          rival: 'Lobas México',
+          score: '2 - 0',
+          mins: "40'",
+          highlight: 'Portería imbatida (6 atajadas)',
+          mvp: true,
+        },
       ],
       career: [
-        { edition: '4.ª Edición (Actual)', team: 'All Stars GV', pj: 8, stat: '3 Goles • 4 Asistencias', badge: 'Muro Defensivo' },
+        {
+          edition: '4.ª Edición (2026)',
+          team: 'F.C. Lionesses',
+          pj: 8,
+          stat: '36 Atajadas • 8 GC',
+          badge: 'Guante Oro',
+        },
       ],
     },
   ];
 
-  // Busca o construye dinámicamente el perfil de cualquiera de las 165 jugadoras del padrón
-  obtenerPerfilPorId(id: number): PerfilJugadoraFotMob {
-    const existente = this.perfilesJugadoras.find((p) => p.id === id);
-    if (existente) return existente;
+  readonly entrenamientos = signal<SesionEntrenamiento[]>([
+    {
+      id: 1,
+      title: 'Fundamentos Técnicos & Control Orientado',
+      coach: 'Coach Nayeli',
+      specialty: 'Técnica individual y primer toque',
+      level: 'Principiante',
+      schedule: 'Miércoles 19:00 - 20:30',
+      venue: 'Cancha Sintética Roma Norte',
+      spotsLeft: 6,
+      price: '$120 MXN',
+    },
+    {
+      id: 2,
+      title: 'Definición, Remate y Movilidad Ofensiva',
+      coach: 'Coach Valeria M.',
+      specialty: 'Finalización en área chica y perfiles',
+      level: 'Intermedio',
+      schedule: 'Jueves 20:00 - 21:30',
+      venue: 'Deportivo Benito Juárez - Cancha 2',
+      spotsLeft: 4,
+      price: '$150 MXN',
+    },
+    {
+      id: 3,
+      title: 'Clínica Abierta Fútbol 7 Inclusivo',
+      coach: 'Cuerpo Técnico LMD',
+      specialty: 'Juego colectivo, táctica y partido amistoso',
+      level: 'Todos los niveles',
+      schedule: 'Sábado 10:00 - 12:00',
+      venue: 'Cancha Principal Liga Mujeres Diversas',
+      spotsLeft: 9,
+      price: 'Gratuito con registro',
+    },
+  ]);
 
-    for (const [teamIdStr, roster] of Object.entries(this.rostersPorEquipo)) {
+  obtenerPerfilJugadora(id: number): PerfilJugadoraFotMob {
+    const encontrado = this.perfilesFotMob.find((p) => p.id === id);
+    if (encontrado) return encontrado;
+
+    for (const [equipoIdStr, roster] of Object.entries(this.rostersPorEquipo)) {
       const jugadora = roster.find((j) => j.playerId === id);
       if (jugadora) {
-        const equipo = this.equipos().find((e) => e.id === Number(teamIdStr));
-        const partes = jugadora.nick.split(' ');
-        const initials = ((partes[0]?.[0] || '') + (partes[1]?.[0] || '')).toUpperCase();
-        const esPortera = jugadora.position === 'Portera';
-        const esDelantera = jugadora.position === 'Delantera';
-        const esMedia = jugadora.position === 'Media';
+        const equipo = this.equipos().find((e) => e.id === Number(equipoIdStr));
+        const iniciales = jugadora.nick
+          .split(' ')
+          .slice(0, 2)
+          .map((n) => n[0])
+          .join('')
+          .toUpperCase();
 
         return {
           id: jugadora.playerId,
-          shortLabel: `${partes[0]} #${jugadora.dorsal}`,
+          shortLabel: `${jugadora.nick.split(' ')[0]} (#${jugadora.dorsal})`,
           fullName: jugadora.nick,
-          initials,
+          initials: iniciales,
           dorsal: jugadora.dorsal,
           team: equipo?.name ?? 'Liga Mujeres Diversas',
           position: jugadora.position,
           pronouns: 'Ella / She',
-          imageConsent: jugadora.dorsal % 2 === 1,
-          accentColor: esPortera ? '#3B82F6' : esDelantera ? '#F43F5E' : esMedia ? '#10B981' : '#8B5CF6',
-          physical: { height: '1.67 m', age: '26 años', birth: '15 May 2000', foot: 'Derecho' },
-          season4: {
-            matchesMinutes: "7 / 260'",
-            goals: esDelantera ? 4 : esMedia ? 2 : 0,
-            saves: esPortera ? 24 : 0,
-            cards: '1 TA • 0 TR',
-          },
-          radar: {
-            Ataque: esDelantera ? 88 : esMedia ? 80 : 58,
-            Fisico: 83,
-            Velocidad: esDelantera ? 87 : 81,
-            Pase: esMedia ? 89 : 78,
-            Regate: esDelantera || esMedia ? 85 : 70,
-            Defensa: esPortera || jugadora.position === 'Defensa' ? 91 : 62,
-          },
+          imageConsent: true,
+          accentColor: '#9333ea',
+          physical: { height: '1.66 m', age: '26 años', birth: '10 May 2000', foot: 'Derecho' },
+          season4: { matchesMinutes: "7 / 245'", goals: 2, saves: 0, cards: '0 / 0' },
+          radar: { Ataque: 76, Fisico: 78, Velocidad: 80, Pase: 79, Regate: 77, Defensa: 74 },
           recentMatches: [
             {
               jornada: 'J08',
-              rival: `Jornada Oficial • ${equipo?.name ?? ''}`,
-              score: '40 min',
-              mins: "40'",
-              highlight: 'Participación titular en cédula oficial',
+              rival: 'Rival Jornada 8',
+              score: '2 - 1',
+              mins: "35'",
+              highlight: 'Participación destacada',
               mvp: false,
             },
           ],
           career: [
             {
-              edition: '4.ª Edición (Actual)',
+              edition: '4.ª Edición (2026)',
               team: equipo?.name ?? 'Liga Mujeres Diversas',
               pj: 7,
-              stat: `${jugadora.position} • Dorsal #${jugadora.dorsal}`,
-              badge: 'Plantilla Oficial',
+              stat: '2 Goles',
+              badge: 'Activa',
             },
           ],
         };
       }
     }
 
-    return this.perfilesJugadoras[0];
+    return this.perfilesFotMob[0];
   }
-
-  readonly partidos = signal<PartidoDominical[]>([
-    {
-      id: 1,
-      round: 'Jornada 09',
-      time: 'Dom 09:00 • Cancha 1',
-      home: 'Queer Goals',
-      away: 'Valquirias',
-      status: 'PROGRAMADO',
-      mvp: 'Duelo por el Liderato',
-      timeline: [{ min: "00'", text: 'Cédula digital lista • 2 tiempos de 20 min sin empates' }],
-    },
-    {
-      id: 2,
-      round: 'Jornada 09',
-      time: 'Dom 09:50 • Cancha 1',
-      home: 'F.C. Lionesses',
-      away: 'Lobas México',
-      status: 'PROGRAMADO',
-      mvp: 'Jornada Dominical CDMX',
-      timeline: [{ min: "00'", text: 'Arbitraje oficial asignado • Inicio puntual 09:50 hrs' }],
-    },
-    {
-      id: 3,
-      round: 'Jornada 08',
-      time: "Finalizado • 40'",
-      home: 'Queer Goals',
-      away: 'Good Vibes',
-      status: 'FINALIZADO',
-      score: '3 - 1',
-      mvp: 'Gabriela Ortiz Vega (Queer Goals)',
-      timeline: [
-        { min: "11'", text: 'Gol de Sofía Navarro Díaz (Queer Goals)' },
-        { min: "20'", text: 'Fin del 1.er tiempo (20 min)' },
-        { min: "26'", text: 'Gol de Valentina Romero Díaz (Good Vibes) — 1-1' },
-        { min: "34'", text: 'Doblete de Sofía Navarro Díaz (Queer Goals)' },
-        { min: "39'", text: 'Gol de Natalia Romero Silva (Queer Goals) — 3-1 (+3 pts)' },
-      ],
-    },
-    {
-      id: 4,
-      round: 'Jornada 08',
-      time: 'Finalizado • Penales',
-      home: 'Valquirias',
-      away: 'F.C. Lionesses',
-      status: 'FINALIZADO',
-      score: '2 - 2',
-      penalties: '(4) - (3)',
-      mvp: 'Evelyn Reyes Navarro (Valquirias)',
-      timeline: [
-        { min: "09'", text: 'Gol de Evelyn Reyes Navarro (Valquirias)' },
-        { min: "18'", text: 'Gol de Paola Reyes Luna (F.C. Lionesses)' },
-        { min: "31'", text: 'Gol de Regina Jiménez Ríos (F.C. Lionesses)' },
-        { min: "38'", text: 'Gol de Evelyn Reyes Navarro (Valquirias) — 2-2' },
-        { min: "40'", text: 'Tanda de Penales: Valquirias (4) - (3) F.C. Lionesses (+3 pts Valquirias)' },
-      ],
-    },
-  ]);
-
-  readonly proximosPartidos = computed(() =>
-    this.partidos().filter((p) => p.status === 'PROGRAMADO'),
-  );
-
-  readonly entrenamientos = signal<SesionEntrenamiento[]>([
-    {
-      id: 1,
-      title: 'Control Orientado y Definición en Área',
-      coach: 'Coach Nayeli',
-      specialty: 'Técnica Individual y Gol',
-      level: 'Todos los niveles',
-      schedule: 'Miércoles 19:30 - 21:00',
-      venue: 'Deportivo Benito Juárez • Cancha 2',
-      spotsLeft: 6,
-      price: '$80 MXN',
-    },
-    {
-      id: 2,
-      title: 'Clínica de Porteras: Achique y Penales',
-      coach: 'Coach Mariana Solís',
-      specialty: 'Entrenamiento de Porteras',
-      level: 'Intermedio',
-      schedule: 'Viernes 18:30 - 20:00',
-      venue: 'Parque Lira • Sintética Norte',
-      spotsLeft: 4,
-      price: '$100 MXN',
-    },
-    {
-      id: 3,
-      title: 'Iniciación al Fútbol 7 y Posicionamiento',
-      coach: 'Coach Renata Cruz',
-      specialty: 'Fundamentos Tácticos',
-      level: 'Principiante',
-      schedule: 'Sábado 10:00 - 11:30',
-      venue: 'Deportivo Reynosa • Cancha 1',
-      spotsLeft: 9,
-      price: '$60 MXN',
-    },
-  ]);
+  obtenerPerfilPorId(id: number): PerfilJugadoraFotMob {
+    return this.obtenerPerfilJugadora(id);
+  }
+  registrarPartido(nuevo: Omit<PartidoDominical, 'id'>): void {
+    const nextId = Math.max(0, ...this.partidos().map((p) => p.id)) + 1;
+    this.partidos.update((lista) => [{ ...nuevo, id: nextId }, ...lista]);
+  }
 }
