@@ -1,13 +1,37 @@
-<div class="min-h-screen flex bg-transparent text-[#111111] dark:text-slate-100">
-  
-  <!-- Aquí va tu <aside> del menú lateral tal como ya lo tienes -->
-  ...
+@if (isAuthRoute()) {
+  <router-outlet></router-outlet>
+} @else {
+  <div
+    class="team-register-aura-bg min-h-screen flex text-[#0F172A] dark:text-[#F8FAFC] transition-colors duration-300"
+  >
+    @if (mobileMenuOpen()) {
+      <div
+        (click)="mobileMenuOpen.set(false)"
+        class="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs md:hidden"
+      ></div>
+    }
 
-  <!-- Área derecha SIN la barra superior de letras chiquitas y con fondo transparente -->
-  <div class="flex-1 flex flex-col min-w-0 bg-transparent">
-    <main class="flex-1 bg-transparent">
-      <router-outlet></router-outlet>
-    </main>
+    <div
+      [class]="mobileMenuOpen() ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+      class="fixed inset-y-0 left-0 z-50 md:static transition-transform duration-300 ease-in-out flex"
+    >
+      <app-sidebar></app-sidebar>
+    </div>
+
+    <div class="flex-1 flex flex-col min-w-0 bg-transparent">
+      @if (!isAdminRoute()) {
+        <app-topbar
+          [currentRole]="authService.currentRole()"
+          [pageTitle]="pageTitle()"
+          (toggleMobileMenu)="mobileMenuOpen.set(!mobileMenuOpen())"
+        ></app-topbar>
+      }
+
+      <main class="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto bg-transparent">
+        <router-outlet></router-outlet>
+      </main>
+
+      <app-footer></app-footer>
+    </div>
   </div>
-
-</div>
+}

@@ -4,51 +4,14 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { SidebarComponent } from './shared/components/sidebar/sidebar';
 import { TopbarComponent } from './shared/components/topbar/topbar';
+import { FooterComponent } from './shared/components/footer/footer';
 import { AuthService } from './core/services/auth';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SidebarComponent, TopbarComponent],
-  template: `
-    @if (isAuthRoute()) {
-      <router-outlet></router-outlet>
-    } @else {
-      <!-- Fondo exterior con el degradado pastel aura -->
-      <div
-        class="team-register-aura-bg min-h-screen flex text-[#0F172A] dark:text-[#F8FAFC] transition-colors duration-300"
-      >
-        @if (mobileMenuOpen()) {
-          <div
-            (click)="mobileMenuOpen.set(false)"
-            class="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs md:hidden"
-          ></div>
-        }
-
-        <div
-          [class]="mobileMenuOpen() ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
-          class="fixed inset-y-0 left-0 z-50 md:static transition-transform duration-300 ease-in-out flex"
-        >
-          <app-sidebar></app-sidebar>
-        </div>
-
-        <!-- Contenedor derecho transparente para que se vea el degradado alrededor de los cuadros blancos -->
-        <div class="flex-1 flex flex-col min-w-0 bg-transparent">
-          @if (!isAdminRoute()) {
-            <app-topbar
-              [currentRole]="authService.currentRole()"
-              [pageTitle]="pageTitle()"
-              (toggleMobileMenu)="mobileMenuOpen.set(!mobileMenuOpen())"
-            ></app-topbar>
-          }
-
-          <main class="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto bg-transparent">
-            <router-outlet></router-outlet>
-          </main>
-        </div>
-      </div>
-    }
-  `,
+  imports: [CommonModule, RouterOutlet, SidebarComponent, TopbarComponent, FooterComponent],
+  templateUrl: './app.html',
 })
 export class App implements OnInit {
   private router = inject(Router);
@@ -85,8 +48,6 @@ export class App implements OnInit {
     else if (url.startsWith('/entrenamientos')) this.pageTitle.set('Entrenamientos');
     else if (url.startsWith('/jugadora')) this.pageTitle.set('Perfil Jugadora');
     else if (url.startsWith('/admin')) this.pageTitle.set('Panel Admin & Cédula');
-    else if (url.startsWith('/equipos')) this.pageTitle.set('Equipos');
-    
     else this.pageTitle.set('Inicio & Comunidad');
   }
 }

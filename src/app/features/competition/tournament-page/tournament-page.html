@@ -1,0 +1,321 @@
+<div class="space-y-6">
+  <!-- 1. BANNER SUPERIOR DE REGLAS OFICIALES -->
+  <div
+    class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] overflow-hidden shadow-xs"
+  >
+    <div class="prism-hairline w-full"></div>
+    <div class="p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3.5">
+        <div
+          class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-extrabold text-sm shrink-0"
+        >
+          40'
+        </div>
+        <div>
+          <h1 class="text-base font-extrabold text-slate-900 dark:text-white">
+            Torneo Oficial — 4.ª Edición
+          </h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            2 tiempos de 20 min •
+            <strong class="font-semibold text-slate-700 dark:text-slate-200">Sin empates</strong>
+            (definición inmediata en tanda de penales) •
+            <strong class="font-semibold text-emerald-600 dark:text-emerald-400">3 pts</strong>
+            victoria /
+            <strong class="font-semibold text-rose-500">0 pts</strong> derrota
+          </p>
+        </div>
+      </div>
+
+      <span
+        class="px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-700 dark:text-amber-300 text-xs font-bold"
+      >
+        {{ ligaData.equipos().length }} Equipos Activos
+      </span>
+    </div>
+  </div>
+
+  <!-- 2. TABLA GENERAL EN VIVO (SIN EMPATES) + RANKINGS LATERALES -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+    <div
+      class="lg:col-span-8 bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] shadow-xs overflow-hidden"
+    >
+      <div
+        class="px-5 py-3.5 border-b border-slate-100 dark:border-[#1F232D] flex items-center justify-between"
+      >
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
+          <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+            Tabla General en Vivo (Sin Empates)
+          </h2>
+        </div>
+        <span class="text-[11px] font-medium text-slate-400"> 3 pts Victoria • 0 pts Derrota </span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr
+              class="border-b border-slate-100 dark:border-[#1F232D] text-[10px] font-bold uppercase tracking-wider text-slate-400"
+            >
+              <th class="py-2.5 pl-5 pr-2">POS</th>
+              <th class="py-2.5 px-2">EQUIPO</th>
+              <th class="py-2.5 px-2 text-center">PJ</th>
+              <th class="py-2.5 px-2 text-center text-emerald-600 dark:text-emerald-400">PG</th>
+              <th class="py-2.5 px-2 text-center text-rose-500">PP</th>
+              <th class="py-2.5 px-2 text-center">GF</th>
+              <th class="py-2.5 px-2 text-center">GC</th>
+              <th class="py-2.5 px-2 text-center">DG</th>
+              <th class="py-2.5 pl-2 pr-5 text-right">PTS</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-[#1C2029] text-xs">
+            @for (team of ligaData.tablaOrdenada(); track team.id; let idx = $index) {
+              <tr
+                (click)="irAEquipos()"
+                class="hover:bg-slate-50 dark:hover:bg-[#1A1E26] cursor-pointer transition-colors"
+              >
+                <td
+                  class="py-2.5 pl-5 pr-2"
+                  [class]="
+                    idx < 4
+                      ? 'text-emerald-600 dark:text-emerald-400 font-extrabold'
+                      : 'text-slate-400 font-semibold'
+                  "
+                >
+                  {{ idx + 1 }}
+                </td>
+                <td class="py-2.5 px-2">
+                  <div class="flex items-center gap-2.5">
+                    <span
+                      [class]="team.color"
+                      class="w-6 h-6 rounded-md text-[10px] font-extrabold text-white flex items-center justify-center shrink-0"
+                    >
+                      {{ team.abbr }}
+                    </span>
+                    <span class="font-bold text-slate-800 dark:text-slate-100">
+                      {{ team.name }}
+                    </span>
+                  </div>
+                </td>
+                <td class="py-2.5 px-2 text-center font-medium text-slate-600 dark:text-slate-300">
+                  {{ team.pj }}
+                </td>
+                <td
+                  class="py-2.5 px-2 text-center font-bold text-emerald-600 dark:text-emerald-400"
+                >
+                  {{ team.pg }}
+                </td>
+                <td class="py-2.5 px-2 text-center font-medium text-rose-500/90">
+                  {{ team.pp }}
+                </td>
+                <td class="py-2.5 px-2 text-center text-slate-600 dark:text-slate-300">
+                  {{ team.gf }}
+                </td>
+                <td class="py-2.5 px-2 text-center text-slate-600 dark:text-slate-300">
+                  {{ team.gc }}
+                </td>
+                <td
+                  class="py-2.5 px-2 text-center font-semibold text-slate-700 dark:text-slate-300"
+                >
+                  {{ team.gf - team.gc > 0 ? '+' + (team.gf - team.gc) : team.gf - team.gc }}
+                </td>
+                <td
+                  class="py-2.5 pl-2 pr-5 text-right font-extrabold text-slate-900 dark:text-white"
+                >
+                  {{ team.pg * 3 }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="lg:col-span-4 space-y-5">
+      <!-- Máximas Goleadoras -->
+      <div
+        class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-4 shadow-xs"
+      >
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#F43F5E]"></span>
+            <h3 class="text-xs font-extrabold text-slate-900 dark:text-white">
+              Máximas Goleadoras
+            </h3>
+          </div>
+          <span class="text-[10px] font-bold tracking-wider text-[#F43F5E] uppercase"> GOLES </span>
+        </div>
+
+        <div class="space-y-2">
+          @for (s of ligaData.topGoleadoras; track s.rank) {
+            <button
+              type="button"
+              (click)="irAPerfilJugadora(s.playerId)"
+              class="card-hover-prism w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-50/90 dark:bg-[#1A1E26] border border-slate-100 dark:border-[#252A35] text-left cursor-pointer"
+            >
+              <div class="text-xs">
+                <span class="font-bold text-slate-900 dark:text-white">
+                  {{ s.rank }}. {{ s.name }}
+                </span>
+                <span class="text-slate-400 ml-1.5 text-[11px]">{{ s.team }}</span>
+              </div>
+              <span class="text-xs font-extrabold text-[#F43F5E]">{{ s.goals }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Mejor Portera -->
+      <div
+        class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-4 shadow-xs"
+      >
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#3B82F6]"></span>
+            <h3 class="text-xs font-extrabold text-slate-900 dark:text-white">Mejor Portera</h3>
+          </div>
+          <span class="text-[10px] font-bold tracking-wider text-[#3B82F6] uppercase">
+            ATAJ / GC
+          </span>
+        </div>
+
+        <div class="space-y-2">
+          @for (k of ligaData.topPorteras; track k.rank) {
+            <button
+              type="button"
+              (click)="irAPerfilJugadora(k.playerId)"
+              class="card-hover-prism w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-50/90 dark:bg-[#1A1E26] border border-slate-100 dark:border-[#252A35] text-left cursor-pointer"
+            >
+              <div class="text-xs truncate pr-2">
+                <span class="font-bold text-slate-900 dark:text-white">
+                  {{ k.rank }}. {{ k.name }}
+                </span>
+                <span class="text-slate-400 ml-1 text-[11px]">{{ k.team }}</span>
+              </div>
+              <span class="text-xs font-extrabold text-[#3B82F6] shrink-0">{{ k.stat }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. PARTIDOS -->
+  <div
+    class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs"
+  >
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+          <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Partidos</h2>
+        </div>
+        @if (filtroPartidos() === 'FINALIZADO') {
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Haz clic en un partido para desplegar la cronología (1' a 40') y tanda de penales
+          </p>
+        }
+      </div>
+
+      <div
+        class="flex items-center gap-1 bg-slate-100 dark:bg-[#1B1F27] p-1 rounded-xl border border-slate-200/80 dark:border-[#2A2F3B]"
+      >
+        <button
+          type="button"
+          (click)="filtroPartidos.set('FINALIZADO')"
+          [class]="
+            filtroPartidos() === 'FINALIZADO'
+              ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-bold shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 font-medium'
+          "
+          class="px-3 py-1 rounded-lg text-xs transition cursor-pointer"
+        >
+          Jornada 08 • Finalizados
+        </button>
+        <button
+          type="button"
+          (click)="filtroPartidos.set('PROGRAMADO')"
+          [class]="
+            filtroPartidos() === 'PROGRAMADO'
+              ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-bold shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 font-medium'
+          "
+          class="px-3 py-1 rounded-lg text-xs transition cursor-pointer"
+        >
+          Jornada 09 • Próximos
+        </button>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      @for (partido of partidosFiltrados(); track partido.id) {
+        <div
+          class="rounded-xl border border-slate-200 dark:border-[#262B37] bg-slate-50/60 dark:bg-[#181C24] overflow-hidden"
+        >
+          <button
+            type="button"
+            (click)="partido.status === 'FINALIZADO' && togglePartido(partido.id)"
+            [class]="
+              partido.status === 'FINALIZADO'
+                ? 'hover:bg-white/80 dark:hover:bg-[#1E232D] cursor-pointer'
+                : 'cursor-default'
+            "
+            class="w-full px-4 py-3.5 flex flex-wrap items-center justify-between gap-3 text-left transition"
+          >
+            <div class="flex items-center gap-2.5">
+              <span class="text-[11px] font-semibold text-slate-400">{{ partido.time }}</span>
+              <span
+                [class]="
+                  partido.penalties
+                    ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/25'
+                    : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20'
+                "
+                class="px-2 py-0.5 rounded-full text-[10px] font-bold border"
+              >
+                {{ partido.penalties ? 'Penales ' + partido.penalties : partido.status }}
+              </span>
+            </div>
+
+            <div class="flex items-center gap-3 text-xs font-extrabold">
+              <span class="text-slate-800 dark:text-slate-100">{{ partido.home }}</span>
+              <span
+                class="px-3 py-1 rounded-lg bg-white dark:bg-[#14171C] border border-slate-200 dark:border-[#2A2F3B] font-mono"
+              >
+                {{ partido.score || 'VS' }}
+              </span>
+              <span class="text-slate-800 dark:text-slate-100">{{ partido.away }}</span>
+            </div>
+
+            <span class="text-[11px] font-bold text-slate-400 w-3 text-right">
+              @if (partido.status === 'FINALIZADO') {
+                {{ expandedMatchId() === partido.id ? '▴' : '▾' }}
+              }
+            </span>
+          </button>
+
+          @if (
+            partido.status === 'FINALIZADO' && expandedMatchId() === partido.id && partido.timeline
+          ) {
+            <div
+              class="px-4 py-3 bg-white dark:bg-[#14171C] border-t border-slate-200/80 dark:border-[#262B37] space-y-2"
+            >
+              <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Cronología del Encuentro (2 × 20 min)
+              </div>
+              @for (ev of partido.timeline; track $index) {
+                <div class="flex items-center gap-3 text-xs">
+                  <span
+                    class="font-mono font-bold text-[11px] px-2 py-0.5 rounded bg-slate-100 dark:bg-[#1E222B] text-slate-700 dark:text-slate-300 w-11 text-center shrink-0"
+                  >
+                    {{ ev.min }}
+                  </span>
+                  <span class="text-slate-700 dark:text-slate-300">{{ ev.text }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
