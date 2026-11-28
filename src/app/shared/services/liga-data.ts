@@ -247,32 +247,69 @@ export class LigaDataService {
 
       const equiposApi = equiposRes.status === 'fulfilled' ? equiposRes.value : [];
       const jugadorasApi = jugadorasRes.status === 'fulfilled' ? jugadorasRes.value : [];
-      const partidosApi = partidosRes.status === 'fulfilled' ? partidosRes.value : [];
+      const listaPartidos = partidosRes.status === 'fulfilled' ? partidosRes.value : [];
       const rankingsApi = rankingsRes.status === 'fulfilled' ? rankingsRes.value : {};
 
-      // Carga directa desde tabla equipos (por id)
-      this.equipos.set(
-        (equiposApi || []).map((eq) => ({
-          id: Number(eq.id),
-          abbr: eq.abbr,
-          name: eq.name,
-          pj: Number(eq.pj ?? 0),
-          pg: Number(eq.pg ?? 0),
-          pp: Number(eq.pp ?? 0),
-          gf: Number(eq.gf ?? 0),
-          gc: Number(eq.gc ?? 0),
-          pts: Number(eq.pts ?? 0),
-          color: eq.color || 'bg-purple-600',
-        })),
-      );
-
-      // Carga directa desde tabla jugadoras (por id)
+      this.partidos.set(listaPartidos);
       this.jugadorasBD.set(jugadorasApi || []);
 
-      // Carga directa desde tabla partidos (por id)
-      this.partidos.set(partidosApi || []);
+      this.equipos.set(
+        (equiposApi || []).map((eq) => {
+          const nombreEq = (eq.name || '').trim().toUpperCase();
 
-      // Carga directa desde estadisticas_partido
+          const partidosEquipo = listaPartidos.filter(
+            (p: any) =>
+              (p.home || '').trim().toUpperCase() === nombreEq ||
+              (p.away || '').trim().toUpperCase() === nombreEq,
+          );
+
+          const sig = partidosEquipo.find((p: any) => p.status === 'PROGRAMADO');
+          const proximoPartido = sig
+            ? {
+                jornada: sig.round || 'Jornada 09',
+                fechaHora: sig.time || 'Dom 09:00',
+                cancha: 'Cancha 1',
+                rival: (sig.home || '').trim().toUpperCase() === nombreEq ? sig.away : sig.home,
+                local: (sig.home || '').trim().toUpperCase() === nombreEq,
+              }
+            : undefined;
+
+          const ultimosPartidos = partidosEquipo
+            .filter((p: any) => p.status === 'FINALIZADO')
+            .slice(0, 5)
+            .map((p: any) => {
+              const esLocal = (p.home || '').trim().toUpperCase() === nombreEq;
+              const rival = esLocal ? p.away : p.home;
+              const partes = (p.score || '0 - 0').split('-').map((n: string) => Number(n.trim()));
+              const golesPropios = esLocal ? partes[0] : partes[1];
+              const golesRival = esLocal ? partes[1] : partes[0];
+
+              return {
+                jornada: p.round || 'Jornada',
+                rival,
+                score: p.score || '0 - 0',
+                gano: golesPropios > golesRival,
+                nota: p.penalties || undefined,
+              };
+            });
+
+          return {
+            id: Number(eq.id),
+            abbr: eq.abbr,
+            name: eq.name,
+            pj: Number(eq.pj ?? 0),
+            pg: Number(eq.pg ?? 0),
+            pp: Number(eq.pp ?? 0),
+            gf: Number(eq.gf ?? 0),
+            gc: Number(eq.gc ?? 0),
+            pts: Number(eq.pts ?? 0),
+            color: eq.color || 'bg-purple-600',
+            proximoPartido,
+            ultimosPartidos,
+          };
+        }),
+      );
+
       this.topGoleadoras.set(
         (rankingsApi?.goleadoras || []).map((g: any, i: number) => ({ rank: i + 1, ...g })),
       );
