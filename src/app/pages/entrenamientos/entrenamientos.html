@@ -10,11 +10,6 @@
         Catálogo Público Abierto (Sin Login Requerido)
       </span>
       <h1 class="text-3xl font-extrabold tracking-tight">Entrenamiento Personalizado & Coaching</h1>
-      <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        Entrena con <strong class="text-slate-900 dark:text-white">Nayeli</strong> y nuestro equipo
-        de especialistas certificadas. Programas presenciales en CDMX y servicio a domicilio
-        adaptado a tus metas y necesidades físicas.
-      </p>
     </div>
 
     <div class="flex flex-wrap gap-2">
@@ -62,16 +57,32 @@
           </p>
         </div>
 
-        <a
-          [href]="buildWhatsAppUrl(item.whatsappMsg)"
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          type="button"
+          (click)="contactCoach(item.coachName)"
           [class]="item.btnStyle"
-          class="w-full py-3 rounded-xl text-xs font-bold text-white text-center shadow-sm hover:opacity-95 transition"
+          class="w-full py-3 rounded-xl text-xs font-bold text-white text-center shadow-sm hover:opacity-95 transition cursor-pointer"
         >
-          Agendar vía WhatsApp ↗
-        </a>
+          Contactar entrenador@
+        </button>
       </article>
     }
   </section>
+
+  @if (coachNotification(); as message) {
+    <div
+      class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-[#0F172A] dark:bg-white text-white dark:text-[#0F172A] border border-emerald-500/50 shadow-2xl"
+    >
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+      <span class="text-xs md:text-sm font-semibold">{{ message }}</span>
+      <button
+        type="button"
+        (click)="coachNotification.set(null)"
+        aria-label="Cerrar notificación"
+        class="ml-2 text-slate-400 hover:text-white dark:hover:text-slate-900 text-xs font-bold cursor-pointer"
+      >
+        ✕
+      </button>
+    </div>
+  }
 </div>

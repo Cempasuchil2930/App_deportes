@@ -8,7 +8,6 @@ interface CoachingService {
   coachName: string;
   credentials: string;
   description: string;
-  whatsappMsg: string;
 }
 
 @Component({
@@ -28,6 +27,8 @@ export class Entrenamientos {
     'Atención Inclusiva',
   ];
   selectedCategory = signal('Todos');
+  coachNotification = signal<string | null>(null);
+  private notificationTimer?: ReturnType<typeof setTimeout>;
 
   services: CoachingService[] = [
     {
@@ -38,7 +39,6 @@ export class Entrenamientos {
       credentials: 'Entrenadora Certificada FMF • Especialista en Técnica Individual y Porteras',
       description:
         'Sesiones personalizadas o en grupos reducidos de control orientado, definición, visión táctica y preparación física específica para jugadoras de todos los niveles.',
-      whatsappMsg: 'Hola Coach Nayeli, me interesa agendar entrenamiento personalizado de Fútbol.',
     },
     {
       discipline: 'Boxeo Femenino',
@@ -48,7 +48,6 @@ export class Entrenamientos {
       credentials: 'Ex-Seleccionada Estatal • Certificación en Boxeo Olímpico y Defensa Personal',
       description:
         'Entrenamiento dinámico de técnica de golpeo, juego de pies, coordinación, liberación de estrés y acondicionamiento cardiovascular en un ambiente sororo y seguro.',
-      whatsappMsg: 'Hola, me gustaría información sobre las sesiones de Boxeo Femenino.',
     },
     {
       discipline: 'Karate',
@@ -58,7 +57,6 @@ export class Entrenamientos {
       credentials: 'Cinta Negra 3.er Dan Karate Do • Instructora de Defensa Personal Integral',
       description:
         'Disciplina marcial enfocada en equilibrio, concentración mental, postura, elasticidad y técnicas prácticas de autodefensa para mujeres y diversidades.',
-      whatsappMsg: 'Hola Sensei Akemi, me interesa información sobre clases de Karate.',
     },
     {
       discipline: 'Acondicionamiento Físico',
@@ -68,7 +66,6 @@ export class Entrenamientos {
       credentials: 'Lic. en Ciencias del Deporte • Prevención de Lesiones y Fuerza Funcional',
       description:
         'Rutinas progresivas de fuerza, resistencia, movilidad articular y prevención de lesiones de rodilla y tobillo pensadas para alto rendimiento o bienestar general.',
-      whatsappMsg: 'Hola, quiero agendar una valoración de Acondicionamiento Físico.',
     },
     {
       discipline: 'Atención Inclusiva',
@@ -78,8 +75,6 @@ export class Entrenamientos {
       credentials: 'Atención Especializada • Adultos Mayores, Padecimientos Físicos y Discapacidad',
       description:
         'Acompañamiento físico humano y empático directamente en tu domicilio. Sesiones diseñadas para rehabilitación suave, movilidad asistida y fortalecimiento seguro.',
-      whatsappMsg:
-        'Hola Coach Nayeli, solicito informes del servicio a domicilio y atención inclusiva.',
     },
   ];
 
@@ -88,7 +83,19 @@ export class Entrenamientos {
     return cat === 'Todos' ? this.services : this.services.filter((s) => s.discipline === cat);
   });
 
-  buildWhatsAppUrl(message: string): string {
-    return `https://wa.me/525500000000?text=${encodeURIComponent(message)}`;
+  contactCoach(coachName?: string): void {
+    const message = coachName
+      ? `Poniéndote en contacto con tu entrenador@ (${coachName})...`
+      : 'Poniéndote en contacto con tu entrenador@...';
+
+    this.coachNotification.set(message);
+
+    if (this.notificationTimer) {
+      clearTimeout(this.notificationTimer);
+    }
+
+    this.notificationTimer = setTimeout(() => {
+      this.coachNotification.set(null);
+    }, 3500);
   }
 }
