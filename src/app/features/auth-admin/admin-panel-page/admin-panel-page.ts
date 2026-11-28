@@ -13,6 +13,18 @@ interface PlayerEventRow {
   redCards: number;
 }
 
+interface SavedMatchSheet {
+  id: number;
+  matchday: string;
+  homeTeam: string;
+  awayTeam: string;
+  homeGoals: number;
+  awayGoals: number;
+  homePlayers?: PlayerEventRow[];
+  awayPlayers?: PlayerEventRow[];
+  date: string;
+}
+
 @Component({
   selector: 'app-admin-panel-page',
   standalone: true,
@@ -149,6 +161,12 @@ interface PlayerEventRow {
         <!-- =============================================================== -->
         <div *ngIf="activeTab() === 'CEDULA'" class="space-y-6">
 
+          <!-- Aviso si está editando una cédula existente -->
+          <div *ngIf="editingSheetId()" class="rounded-2xl px-4 py-3 bg-[#E5EFFC] border border-[#7FA3D4]/70 text-xs font-bold text-[#2B548C] flex items-center justify-between">
+            <span>✎ Editando cédula guardada ({{ selectedMatchday }} · {{ homeTeam }} vs {{ awayTeam }})</span>
+            <button type="button" (click)="cancelEditSheet()" class="underline cursor-pointer">Cancelar edición</button>
+          </div>
+
           <!-- Cuadro interior BLANCO PURO: Datos del encuentro y marcador -->
           <div class="admin-white-card rounded-3xl p-6 sm:p-7 space-y-6">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pb-4 border-b border-slate-200/80 dark:border-[#232730]">
@@ -270,14 +288,71 @@ interface PlayerEventRow {
 
           </div>
 
-          <!-- Botón Guardar Cédula -->
-          <div class="flex justify-end">
+          <!-- Botón Guardar / Actualizar Cédula -->
+          <div class="flex justify-end gap-3">
+            <button
+              *ngIf="editingSheetId()"
+              type="button"
+              (click)="cancelEditSheet()"
+              class="px-5 py-3 rounded-full bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition-colors cursor-pointer">
+              Cancelar
+            </button>
+
             <button
               type="button"
               (click)="saveMatchSheet()"
               class="px-7 py-3 rounded-full bg-[#FCE7EB] hover:bg-[#F9D5DC] text-[#8E3545] border border-[#C57B87]/60 text-xs font-extrabold tracking-wide shadow-xs transition-colors cursor-pointer">
-              Guardar Cédula Oficial
+              {{ editingSheetId() ? 'Actualizar Cédula Oficial' : 'Guardar Cédula Oficial' }}
             </button>
+          </div>
+
+          <!-- Historial de Cédulas Oficiales Guardadas -->
+          <div *ngIf="savedSheets().length > 0" class="admin-white-card rounded-3xl p-6 sm:p-7 space-y-4">
+            <div class="pb-3 border-b border-slate-200/80 dark:border-[#232730]">
+              <h2 class="text-base font-extrabold text-[#111111] dark:text-white">
+                Cédulas Oficiales Guardadas
+              </h2>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="border-b border-slate-200/80 dark:border-[#232730] text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                    <th class="py-2.5 px-3">Jornada</th>
+                    <th class="py-2.5 px-3">Encuentro</th>
+                    <th class="py-2.5 px-3 text-center">Marcador</th>
+                    <th class="py-2.5 px-3">Fecha</th>
+                    <th class="py-2.5 px-3 text-right">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-[#232730]">
+                  <tr *ngFor="let c of savedSheets()">
+                    <td class="py-3 px-3 font-bold text-[#2E5B9A]">{{ c.matchday }}</td>
+                    <td class="py-3 px-3 font-extrabold text-[#111111] dark:text-white">
+                      {{ c.homeTeam }} vs {{ c.awayTeam }}
+                    </td>
+                    <td class="py-3 px-3 text-center font-black text-sm">
+                      {{ c.homeGoals }} - {{ c.awayGoals }}
+                    </td>
+                    <td class="py-3 px-3 text-slate-500">{{ c.date }}</td>
+                    <td class="py-3 px-3 text-right space-x-2">
+                      <button
+                        type="button"
+                        (click)="editMatchSheet(c)"
+                        class="px-3 py-1 rounded-full bg-[#E5EFFC] hover:bg-blue-100 text-[#2B548C] font-bold text-[11px] transition-colors cursor-pointer">
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        (click)="deleteMatchSheet(c.id)"
+                        class="px-3 py-1 rounded-full bg-[#FFF1F2] hover:bg-rose-100 text-[#E11D48] font-bold text-[11px] transition-colors cursor-pointer">
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
         </div>
@@ -291,6 +366,11 @@ export class AdminPanelPageComponent {
 
   activeTab = signal<AdminTab>('PANEL');
   feedbackMessage = signal<string>('');
+  editingSheetId = signal<number | null>(null);
+
+  savedSheets = signal<SavedMatchSheet[]>(
+    JSON.parse(localStorage.getItem('md_cedulas_guardadas') || '[]')
+  );
 
   selectedMatchday = 'Jornada 4';
   homeTeam = 'Queer Goals F.C.';
@@ -330,9 +410,60 @@ export class AdminPanelPageComponent {
     return this.awayPlayers().reduce((acc, p) => acc + (Number(p.goals) || 0), 0);
   }
 
+  editMatchSheet(sheet: SavedMatchSheet): void {
+    this.editingSheetId.set(sheet.id);
+    this.selectedMatchday = sheet.matchday;
+    this.homeTeam = sheet.homeTeam;
+    this.awayTeam = sheet.awayTeam;
+
+    if (sheet.homePlayers) {
+      this.homePlayers.set(sheet.homePlayers.map((p) => ({ ...p })));
+    }
+    if (sheet.awayPlayers) {
+      this.awayPlayers.set(sheet.awayPlayers.map((p) => ({ ...p })));
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  cancelEditSheet(): void {
+    this.editingSheetId.set(null);
+  }
+
   saveMatchSheet(): void {
+    const editId = this.editingSheetId();
+    const cedulaData: SavedMatchSheet = {
+      id: editId ?? Date.now(),
+      matchday: this.selectedMatchday,
+      homeTeam: this.homeTeam,
+      awayTeam: this.awayTeam,
+      homeGoals: this.totalHomeGoals(),
+      awayGoals: this.totalAwayGoals(),
+      homePlayers: this.homePlayers().map((p) => ({ ...p })),
+      awayPlayers: this.awayPlayers().map((p) => ({ ...p })),
+      date: new Date().toLocaleDateString('es-MX'),
+    };
+
+    const actualizadas = editId
+      ? this.savedSheets().map((c) => (c.id === editId ? cedulaData : c))
+      : [cedulaData, ...this.savedSheets()];
+
+    this.savedSheets.set(actualizadas);
+    localStorage.setItem('md_cedulas_guardadas', JSON.stringify(actualizadas));
+
     this.feedbackMessage.set(
-      `Cédula guardada: ${this.homeTeam} ${this.totalHomeGoals()} - ${this.totalAwayGoals()} ${this.awayTeam} (${this.selectedMatchday}).`
+      `${editId ? 'Cédula actualizada' : 'Cédula guardada'}: ${this.homeTeam} ${this.totalHomeGoals()} - ${this.totalAwayGoals()} ${this.awayTeam} (${this.selectedMatchday}).`
     );
+    this.editingSheetId.set(null);
+  }
+
+  deleteMatchSheet(id: number): void {
+    if (this.editingSheetId() === id) {
+      this.editingSheetId.set(null);
+    }
+    const actualizadas = this.savedSheets().filter((c) => c.id !== id);
+    this.savedSheets.set(actualizadas);
+    localStorage.setItem('md_cedulas_guardadas', JSON.stringify(actualizadas));
+    this.feedbackMessage.set('Cédula eliminada del historial.');
   }
 }
