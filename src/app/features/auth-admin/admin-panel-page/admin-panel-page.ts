@@ -13,6 +13,18 @@ interface PlayerEventRow {
   redCards: number;
 }
 
+interface SavedMatchSheet {
+  id: number;
+  matchday: string;
+  homeTeam: string;
+  awayTeam: string;
+  homeGoals: number;
+  awayGoals: number;
+  homePlayers?: PlayerEventRow[];
+  awayPlayers?: PlayerEventRow[];
+  date: string;
+}
+
 @Component({
   selector: 'app-admin-panel-page',
   standalone: true,
@@ -24,6 +36,11 @@ export class AdminPanelPageComponent {
 
   activeTab = signal<AdminTab>('PANEL');
   feedbackMessage = signal<string>('');
+  editingSheetId = signal<number | null>(null);
+
+  savedSheets = signal<SavedMatchSheet[]>(
+    JSON.parse(localStorage.getItem('md_cedulas_guardadas') || '[]')
+  );
 
   selectedMatchday = 'Jornada 4';
   homeTeam = 'Queer Goals F.C.';
@@ -65,9 +82,60 @@ export class AdminPanelPageComponent {
     return this.awayPlayers().reduce((acc, p) => acc + (Number(p.goals) || 0), 0);
   }
 
+  editMatchSheet(sheet: SavedMatchSheet): void {
+    this.editingSheetId.set(sheet.id);
+    this.selectedMatchday = sheet.matchday;
+    this.homeTeam = sheet.homeTeam;
+    this.awayTeam = sheet.awayTeam;
+
+    if (sheet.homePlayers) {
+      this.homePlayers.set(sheet.homePlayers.map((p) => ({ ...p })));
+    }
+    if (sheet.awayPlayers) {
+      this.awayPlayers.set(sheet.awayPlayers.map((p) => ({ ...p })));
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  cancelEditSheet(): void {
+    this.editingSheetId.set(null);
+  }
+
   saveMatchSheet(): void {
+    const editId = this.editingSheetId();
+    const cedulaData: SavedMatchSheet = {
+      id: editId ?? Date.now(),
+      matchday: this.selectedMatchday,
+      homeTeam: this.homeTeam,
+      awayTeam: this.awayTeam,
+      homeGoals: this.totalHomeGoals(),
+      awayGoals: this.totalAwayGoals(),
+      homePlayers: this.homePlayers().map((p) => ({ ...p })),
+      awayPlayers: this.awayPlayers().map((p) => ({ ...p })),
+      date: new Date().toLocaleDateString('es-MX'),
+    };
+
+    const actualizadas = editId
+      ? this.savedSheets().map((c) => (c.id === editId ? cedulaData : c))
+      : [cedulaData, ...this.savedSheets()];
+
+    this.savedSheets.set(actualizadas);
+    localStorage.setItem('md_cedulas_guardadas', JSON.stringify(actualizadas));
+
     this.feedbackMessage.set(
-      `Cédula guardada: ${this.homeTeam} ${this.totalHomeGoals()} - ${this.totalAwayGoals()} ${this.awayTeam} (${this.selectedMatchday}).`,
+      `${editId ? 'Cédula actualizada' : 'Cédula guardada'}: ${this.homeTeam} ${this.totalHomeGoals()} - ${this.totalAwayGoals()} ${this.awayTeam} (${this.selectedMatchday}).`
     );
+    this.editingSheetId.set(null);
+  }
+
+  deleteMatchSheet(id: number): void {
+    if (this.editingSheetId() === id) {
+      this.editingSheetId.set(null);
+    }
+    const actualizadas = this.savedSheets().filter((c) => c.id !== id);
+    this.savedSheets.set(actualizadas);
+    localStorage.setItem('md_cedulas_guardadas', JSON.stringify(actualizadas));
+    this.feedbackMessage.set('Cédula eliminada del historial.');
   }
 }
