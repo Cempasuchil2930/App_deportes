@@ -1,5 +1,4 @@
 <div class="space-y-8 pb-12">
-  <!-- BANNER SUPERIOR -->
   <section
     class="rounded-3xl bg-white dark:bg-[#14171C] border border-slate-200 dark:border-[#232730] p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6"
   >
@@ -18,7 +17,6 @@
       </p>
     </div>
 
-    <!-- Filtros por Disciplina -->
     <div class="flex flex-wrap gap-2">
       @for (cat of categories; track cat) {
         <button
@@ -36,7 +34,6 @@
     </div>
   </section>
 
-  <!-- TARJETAS DE ESPECIALISTAS -->
   <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     @for (item of filteredServices(); track item.coachName) {
       <article

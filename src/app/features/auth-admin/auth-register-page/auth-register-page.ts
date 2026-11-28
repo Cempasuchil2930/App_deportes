@@ -132,9 +132,7 @@ export class AuthRegisterPageComponent implements OnInit {
       fotoAutorizada: Boolean(v.photoAuthorized),
     });
 
-    this.feedbackMessage.set(
-      `Solicitud enviada para ${String(v.teamName).trim()}. Coach Nayeli la revisará pronto.`,
-    );
+    this.feedbackMessage.set(`El equipo "${String(v.teamName).trim()}" se registró correctamente.`);
     this.registerForm.reset({
       dorsal: 10,
       position: 'Media',

@@ -13,7 +13,7 @@ export class SidebarComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
 
-  // Lee directamente el Signal de AuthService en tiempo real
+  
   currentRole = this.authService.currentRole;
 
   collapsed = signal(false);

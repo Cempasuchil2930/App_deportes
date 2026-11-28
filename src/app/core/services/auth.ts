@@ -39,7 +39,7 @@ export class AuthService {
   iniciarSesion(email: string, role: UserRole, nombre?: string): boolean {
     const cleanEmail = email.trim().toLowerCase();
 
-    // Validación estricta: solo Nayeli puede entrar como Administradora
+   
     if (role === 'ADMIN' && cleanEmail !== this.ADMIN_EMAIL) {
       return false;
     }

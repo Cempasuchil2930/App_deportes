@@ -5,7 +5,7 @@ import { roleGuard } from './core/guards/role-guard';
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
 
-  // 1. Flujos de Acceso y Registro (Sin Sidebar ni Topbar - Dev 2)
+  
   {
     path: 'login',
     data: { view: 'LOGIN' },
@@ -31,7 +31,7 @@ export const routes: Routes = [
       ),
   },
 
-  // 2. Vistas principales (Dev 3)
+ 
   { path: 'home', component: Home },
   {
     path: 'entrenamientos',
@@ -41,7 +41,7 @@ export const routes: Routes = [
       import('./pages/entrenamientos/entrenamientos').then((m) => m.Entrenamientos),
   },
 
-  // 3. Panel de Administración y Cédula Arbitral (Dev 2)
+  
   {
     path: 'admin',
     canActivate: [roleGuard],
@@ -52,7 +52,6 @@ export const routes: Routes = [
       ),
   },
 
-  // 4. Módulo de Competición (Dev 1: Torneo, Equipos y Perfil de Jugadora)
   {
     path: 'torneo',
     loadComponent: () =>
@@ -75,6 +74,6 @@ export const routes: Routes = [
       ),
   },
 
-  // Comodín siempre al final
+
   { path: '**', redirectTo: 'login' },
 ];

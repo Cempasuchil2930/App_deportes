@@ -30,12 +30,10 @@ interface SavedMatchSheet {
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <!-- Exterior transparente sobre el degradado de la pantalla -->
     <div
       class="min-h-screen bg-transparent text-[#111111] dark:text-slate-100 p-4 sm:p-8 transition-colors duration-300"
     >
       <div class="max-w-[1140px] mx-auto space-y-6">
-        <!-- Título principal y selector de vista -->
         <div class="flex flex-wrap items-center justify-between gap-4 px-1">
           <h1
             class="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#111111] dark:text-white"
@@ -72,7 +70,6 @@ interface SavedMatchSheet {
           </div>
         </div>
 
-        <!-- Mensaje de confirmación -->
         <div
           *ngIf="feedbackMessage()"
           class="rounded-2xl px-4 py-3 bg-[#ECFDF5] border border-[#A7F3D0] text-xs font-bold text-[#059669] flex items-center justify-between"
@@ -83,11 +80,7 @@ interface SavedMatchSheet {
           </button>
         </div>
 
-        <!-- =============================================================== -->
-        <!-- PESTAÑA 1: PANEL ADMINISTRATIVO                                 -->
-        <!-- =============================================================== -->
         <div *ngIf="activeTab() === 'PANEL'" class="space-y-6">
-          <!-- Cuadros interiores en BLANCO PURO -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="admin-white-card rounded-3xl p-6 space-y-1.5">
               <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">
@@ -113,7 +106,6 @@ interface SavedMatchSheet {
             </div>
           </div>
 
-          <!-- Cuadro interior BLANCO PURO: Solicitudes de Inscripción -->
           <div class="admin-white-card rounded-3xl p-6 sm:p-7 space-y-5">
             <div class="pb-3 border-b border-slate-200/80 dark:border-[#232730]">
               <h2 class="text-base font-extrabold text-[#111111] dark:text-white">
@@ -183,11 +175,7 @@ interface SavedMatchSheet {
           </div>
         </div>
 
-        <!-- =============================================================== -->
-        <!-- PESTAÑA 2: CÉDULA ARBITRAL / DE PARTIDO                         -->
-        <!-- =============================================================== -->
         <div *ngIf="activeTab() === 'CEDULA'" class="space-y-6">
-          <!-- Aviso si está editando una cédula existente -->
           <div
             *ngIf="editingSheetId()"
             class="rounded-2xl px-4 py-3 bg-[#E5EFFC] border border-[#7FA3D4]/70 text-xs font-bold text-[#2B548C] flex items-center justify-between"
@@ -201,7 +189,6 @@ interface SavedMatchSheet {
             </button>
           </div>
 
-          <!-- Cuadro interior BLANCO PURO: Datos del encuentro y marcador -->
           <div class="admin-white-card rounded-3xl p-6 sm:p-7 space-y-6">
             <div
               class="grid grid-cols-1 sm:grid-cols-3 gap-4 pb-4 border-b border-slate-200/80 dark:border-[#232730]"
@@ -244,7 +231,6 @@ interface SavedMatchSheet {
               </div>
             </div>
 
-            <!-- Marcador Global -->
             <div class="flex items-center justify-center gap-6 py-2">
               <div class="text-center space-y-1">
                 <p class="text-xs font-extrabold text-slate-600">{{ homeTeam }}</p>
@@ -264,9 +250,7 @@ interface SavedMatchSheet {
             </div>
           </div>
 
-          <!-- Cuadros interiores BLANCO PURO: Estadísticas por equipo -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Local -->
             <div class="admin-white-card rounded-3xl p-6 space-y-4">
               <h2
                 class="text-sm font-extrabold text-[#111111] dark:text-white pb-2 border-b border-slate-200/80 dark:border-[#232730]"
@@ -319,7 +303,6 @@ interface SavedMatchSheet {
               </table>
             </div>
 
-            <!-- Visitante -->
             <div class="admin-white-card rounded-3xl p-6 space-y-4">
               <h2
                 class="text-sm font-extrabold text-[#111111] dark:text-white pb-2 border-b border-slate-200/80 dark:border-[#232730]"
@@ -373,7 +356,6 @@ interface SavedMatchSheet {
             </div>
           </div>
 
-          <!-- Botón Guardar / Actualizar Cédula -->
           <div class="flex justify-end gap-3">
             <button
               *ngIf="editingSheetId()"
@@ -393,7 +375,6 @@ interface SavedMatchSheet {
             </button>
           </div>
 
-          <!-- Historial de Cédulas Oficiales Guardadas -->
           <div
             *ngIf="savedSheets().length > 0"
             class="admin-white-card rounded-3xl p-6 sm:p-7 space-y-4"

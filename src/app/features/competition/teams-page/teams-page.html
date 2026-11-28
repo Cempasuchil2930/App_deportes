@@ -1,5 +1,4 @@
 <div class="space-y-6">
-  <!-- 1. SELECTOR DE EQUIPOS -->
   <div
     class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs"
   >
@@ -45,7 +44,6 @@
     </div>
   </div>
 
-  <!-- 2. CABECERA DEL EQUIPO SELECCIONADO -->
   <div
     class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] overflow-hidden shadow-xs"
   >
@@ -97,11 +95,8 @@
     </div>
   </div>
 
-  <!-- 3. BLOQUE PRINCIPAL DE INFORMACIÓN DEL EQUIPO -->
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-    <!-- COLUMNA IZQUIERDA (7 cols): Partido Siguiente + Últimos Partidos -->
     <div class="lg:col-span-7 space-y-5">
-      <!-- Partido Siguiente -->
       <div
         class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs"
       >
@@ -151,7 +146,6 @@
         }
       </div>
 
-      <!-- Últimos Partidos -->
       <div
         class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs"
       >
@@ -198,9 +192,7 @@
       </div>
     </div>
 
-    <!-- COLUMNA DERECHA (5 cols): Posición en la Tabla + Mejores Jugadoras + Trofeos -->
     <div class="lg:col-span-5 space-y-5">
-      <!-- Posición en la Tabla -->
       <div
         class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] overflow-hidden shadow-xs"
       >
@@ -277,7 +269,6 @@
         </table>
       </div>
 
-      <!-- Mejores Jugadoras del Equipo (Goleadora y Asistencias) -->
       @if (equipoActivo().mejoresJugadoras; as mejores) {
         <div
           class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-4 shadow-xs"
@@ -326,7 +317,6 @@
         </div>
       }
 
-      <!-- Trofeos (Torneo Apertura / Clausura) -->
       <div
         class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-4 shadow-xs"
       >
@@ -363,7 +353,6 @@
     </div>
   </div>
 
-  <!-- 4. EQUIPO (PLANTILLA COMPLETA UNIFICADA CON POSICIÓN POR ESCRITO) -->
   <div
     class="bg-white dark:bg-[#14171C] rounded-2xl border border-slate-200 dark:border-[#232730] p-5 shadow-xs space-y-4"
   >

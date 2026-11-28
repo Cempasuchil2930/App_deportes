@@ -491,7 +491,7 @@ export class LigaDataService {
 
   readonly top5Equipos = computed(() => this.tablaOrdenada().slice(0, 5));
 
-  // Padrón Oficial de 15 jugadoras por equipo (PDF 4.ª Edición)
+ 
   readonly rostersPorEquipo: Record<number, JugadoraRosterPublica[]> = {
     1: [
       { playerId: 101, nick: 'Mariana López Hernández', dorsal: 1, position: 'Portera' },

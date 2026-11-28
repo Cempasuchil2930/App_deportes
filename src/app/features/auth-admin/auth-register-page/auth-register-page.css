@@ -1,4 +1,4 @@
-/* Marco degradado arcoíris de 3px para el cuadro principal del Login */
+
 .login-rainbow-frame {
   padding: 10px;
   border-radius: 1.65rem;
@@ -14,7 +14,7 @@
   box-shadow: 0 20px 45px -12px rgba(139, 92, 246, 0.22);
 }
 
-/* Interior cristalino de la tarjeta dentro del marco */
+
 .login-rainbow-inner {
   border-radius: calc(1.65rem - 3px);
   background: rgba(255, 255, 255, 0.90);
@@ -26,7 +26,7 @@
   background: rgba(20, 23, 28, 0.92);
 }
 
-/* Animación suave al cambiar de vista */
+
 :host {
   display: block;
   animation: fadeInView 0.25s ease-out;
@@ -43,7 +43,7 @@
   }
 }
 
-/* Fondo degradado tipo aura multicolor suave (Inscribir Equipo) */
+
 .team-register-aura-bg {
   background-color: #f4f6f8;
   background-image:
@@ -55,7 +55,7 @@
     radial-gradient(at 85% 65%, rgba(168, 85, 247, 0.28) 0px, transparent 52%);
 }
 
-/* Modo oscuro compatible */
+
 :host-context(.dark) .team-register-aura-bg {
   background-color: #0b0d10;
   background-image:
@@ -65,7 +65,7 @@
     radial-gradient(at 80% 65%, rgba(139, 92, 246, 0.18) 0px, transparent 52%);
 }
 
-/* Tarjetas blancas translúcidas estilo glassmorphism */
+
 .glass-form-card {
   background: rgba(255, 255, 255, 0.84);
   backdrop-filter: blur(16px);

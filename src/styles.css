@@ -38,7 +38,7 @@ body {
     color 0.25s ease;
 }
 
-/* Línea superior/divisora fluida con los 6 colores repartidos */
+
 .prism-hairline {
   height: 2px;
   background: linear-gradient(
@@ -52,7 +52,7 @@ body {
   );
 }
 
-/* Hover luminoso para botones principales */
+
 .btn-glow {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -64,7 +64,7 @@ body {
     0px 4px 14px -2px rgba(234, 179, 8, 0.3);
 }
 
-/* Hover luminoso suave para tarjetas */
+
 .card-hover-prism {
   transition:
     transform 0.22s ease,
@@ -78,7 +78,7 @@ body {
     0 10px 25px -10px rgba(139, 92, 246, 0.22),
     0 4px 12px -4px rgba(16, 185, 129, 0.15);
 }
-/* Fondo degradado suave tipo aura (mismo del Login y Registro) */
+
 .team-register-aura-bg {
   background-color: #fafafa;
   background-image:
@@ -97,7 +97,7 @@ body {
     radial-gradient(circle at 18% 85%, rgba(139, 92, 246, 0.14) 0%, transparent 45%);
 }
 
-/* Contenedores de información en blanco sólido */
+
 .admin-white-card {
   background-color: #ffffff;
   border: 1px solid rgba(226, 232, 240, 0.95);
@@ -109,7 +109,7 @@ body {
   border-color: #232730;
 }
 
-/* 1. Fondo degradado pastel en TODA la pantalla exterior */
+
 html,
 body {
   min-height: 100vh;
@@ -132,7 +132,7 @@ body {
     radial-gradient(circle at 18% 85%, rgba(139, 92, 246, 0.16) 0%, transparent 45%);
 }
 
-/* 2. Contenedores interiores en BLANCO PURO sólido */
+
 .admin-white-card {
   background-color: #ffffff !important;
   border: 1px solid rgba(226, 232, 240, 0.95);

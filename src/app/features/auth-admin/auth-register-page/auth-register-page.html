@@ -1,7 +1,6 @@
 <div
   class="team-register-aura-bg min-h-screen text-[#111111] dark:text-slate-100 p-4 sm:p-8 flex flex-col transition-colors duration-300"
 >
-  <!-- Mensaje de éxito -->
   <div
     *ngIf="feedbackMessage()"
     class="max-w-[780px] w-full mx-auto mb-4 rounded-2xl px-4 py-3 bg-[#ECFDF5] dark:bg-emerald-950/60 border border-[#A7F3D0] dark:border-emerald-800 text-xs font-bold text-[#059669] dark:text-emerald-300 flex items-center justify-between shadow-xs"
@@ -16,7 +15,6 @@
     </button>
   </div>
 
-  <!-- Mensaje de error -->
   <div
     *ngIf="errorMessage()"
     class="max-w-[500px] w-full mx-auto mb-4 rounded-2xl px-4 py-3 bg-[#FFF1F2] dark:bg-rose-950/60 border border-[#FECDD3] dark:border-rose-800 text-xs font-bold text-[#E11D48] dark:text-rose-300 flex items-center justify-between shadow-xs"
@@ -27,9 +25,6 @@
     </button>
   </div>
 
-  <!-- ================================================================= -->
-  <!-- VISTA 1: INICIAR SESIÓN (/login)                                  -->
-  <!-- ================================================================= -->
   <div *ngIf="activeView() === 'LOGIN'" class="flex-1 flex items-center justify-center py-6">
     <div class="login-rainbow-frame w-full max-w-[486px]">
       <div class="login-rainbow-inner w-full overflow-hidden">
@@ -50,7 +45,6 @@
             </p>
           </div>
 
-          <!-- Solo 2 Roles: Administradora y Equipo -->
           <div class="space-y-2.5">
             <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500 text-center">
               Selecciona tu perfil de acceso
@@ -181,7 +175,6 @@
             </button>
           </form>
 
-          <!-- Opción Inscribir Equipo (Solo en pestaña Equipo) -->
           <div
             *ngIf="selectedLoginRole() === 'CAPTAIN'"
             class="pt-4 border-t border-slate-200/70 dark:border-[#232730] text-center space-y-2"
@@ -197,7 +190,6 @@
             </a>
           </div>
 
-          <!-- Separador "O TAMBIÉN" centrado -->
           <div class="pt-1 space-y-3">
             <div class="flex items-center gap-3">
               <div class="h-px flex-1 bg-slate-200/90 dark:bg-[#232730]"></div>
@@ -222,9 +214,6 @@
     </div>
   </div>
 
-  <!-- ================================================================= -->
-  <!-- VISTA 2: RECUPERAR CONTRASEÑA (/recuperar-password)               -->
-  <!-- ================================================================= -->
   <div *ngIf="activeView() === 'RECOVER'" class="flex-1 flex items-center justify-center py-6">
     <div class="login-rainbow-frame w-full max-w-[486px]">
       <div class="login-rainbow-inner w-full overflow-hidden">
@@ -276,9 +265,6 @@
     </div>
   </div>
 
-  <!-- ================================================================= -->
-  <!-- VISTA 3: INSCRIBIR EQUIPO (/registro-equipo)                      -->
-  <!-- ================================================================= -->
   <div
     *ngIf="activeView() === 'REGISTER_TEAM'"
     class="max-w-[780px] w-full mx-auto py-4 sm:py-6 space-y-6"
@@ -297,7 +283,6 @@
     </div>
 
     <form [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()" class="space-y-6">
-      <!-- Tarjeta 1: Datos del Equipo -->
       <div class="glass-form-card rounded-3xl p-6 sm:p-7 space-y-5">
         <div class="pb-3 border-b border-slate-200/70 dark:border-slate-700/60">
           <h2 class="text-base font-extrabold text-[#111111] dark:text-white">Datos del Equipo</h2>
@@ -343,7 +328,6 @@
         </div>
       </div>
 
-      <!-- Tarjeta 2: Datos de la Capitana / Manager -->
       <div class="glass-form-card rounded-3xl p-6 sm:p-7 space-y-5">
         <div class="pb-3 border-b border-slate-200/70 dark:border-slate-700/60">
           <h2 class="text-base font-extrabold text-[#111111] dark:text-white">
@@ -377,7 +361,6 @@
           </div>
         </div>
 
-        <!-- Correo y Contraseña -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-2">
@@ -452,7 +435,6 @@
               </button>
             </div>
 
-            <!-- Mensaje rojo si no cumple con los 6 caracteres -->
             <p
               *ngIf="
                 registerForm.get('password')?.invalid &&
@@ -510,7 +492,6 @@
           </div>
         </div>
 
-        <!-- Pronombres: solo Ella, Elle y Él -->
         <div>
           <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-2.5">
             Pronombres
@@ -533,7 +514,6 @@
         </div>
       </div>
 
-      <!-- Tarjeta 3: Consentimientos y Botón Enviar Rosita Pastel -->
       <div class="glass-form-card rounded-3xl p-6 sm:p-7 space-y-4">
         <div
           class="flex items-center justify-between gap-4 p-4 rounded-2xl bg-white/60 dark:bg-[#0B0D10]/70 border border-slate-200/80 dark:border-slate-700"
